@@ -1,0 +1,4077 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安全衛生推進者 管理システム</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Rajdhani:wght@500;700&display=swap');
+
+:root {
+  --primary: #1a5c38;
+  --primary-light: #2d7a50;
+  --primary-dark: #0e3d25;
+  --accent: #f0a500;
+  --accent-light: #ffcc44;
+  --danger: #c0392b;
+  --danger-light: #e74c3c;
+  --warning: #e67e22;
+  --info: #2980b9;
+  --bg: #f4f6f3;
+  --surface: #ffffff;
+  --surface2: #f0f4ef;
+  --border: #d4ddd0;
+  --text: #1c2b1e;
+  --text2: #4a5e4d;
+  --text3: #7a8f7e;
+  --sidebar-w: 240px;
+  --shadow: 0 2px 12px rgba(26,92,56,0.08);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Sidebar ── */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--primary-dark);
+  min-height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-logo .logo-en {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.sidebar-logo .logo-ja {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  display: block;
+}
+
+.sidebar-logo .logo-badge {
+  display: inline-block;
+  margin-top: 6px;
+  background: var(--primary-light);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.nav-section {
+  padding: 12px 0 4px;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.35);
+  padding: 0 16px 6px;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+.nav-item.active {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+
+.nav-item .nav-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: var(--primary-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.company-badge {
+  background: rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+}
+
+.company-badge .company-name {
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ── Main ── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+}
+
+.page-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.page-header-left h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-header-left p {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--primary-light); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--surface2); }
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+.btn-accent:hover { background: var(--accent-light); }
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover { background: var(--danger-light); }
+
+.content { padding: 28px 32px; }
+
+/* ── Pages ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title .icon-circle {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Dashboard ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.stat-card .stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-note {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.stat-card.accent .stat-value { color: var(--accent); }
+.stat-card.danger .stat-value { color: var(--danger); }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+/* ── Progress ── */
+.progress-bar-wrap {
+  background: var(--surface2);
+  border-radius: 20px;
+  height: 8px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  transition: width 0.6s ease;
+}
+
+.progress-bar.accent { background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+.progress-bar.danger { background: linear-gradient(90deg, var(--danger), var(--danger-light)); }
+
+/* ── Checklist ── */
+.checklist-section {
+  margin-bottom: 20px;
+}
+
+.checklist-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--surface2);
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 3px solid var(--primary);
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  transition: background 0.1s;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+
+.check-item:last-child { border-bottom: none; }
+.check-item:hover { background: var(--surface2); }
+
+.check-item input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.check-item.done .check-label { color: var(--text3); text-decoration: line-through; }
+
+.check-label {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  transition: all 0.2s;
+}
+
+.check-label .check-note {
+  display: block;
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.priority-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-top: 2px;
+}
+.priority-tag.high { background: #fde8e8; color: var(--danger); }
+.priority-tag.medium { background: #fef3e2; color: var(--warning); }
+.priority-tag.low { background: #e8f4e8; color: var(--primary); }
+
+/* ── Safety Patrol ── */
+.patrol-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26,92,56,0.1);
+}
+
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+.patrol-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.patrol-table th {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.patrol-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.patrol-table tr:hover td { background: var(--surface2); }
+
+.status-select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  outline: none;
+  background: var(--surface);
+  width: 100%;
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.status-badge.ok { background: #e8f4e8; color: var(--primary); }
+.status-badge.ng { background: #fde8e8; color: var(--danger); }
+.status-badge.na { background: #f0f0f0; color: var(--text3); }
+
+/* ── Risk Assessment ── */
+.risk-matrix {
+  display: grid;
+  grid-template-columns: 80px repeat(4, 1fr);
+  gap: 4px;
+  margin: 12px 0;
+}
+
+.risk-cell {
+  padding: 8px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.risk-cell.header { background: var(--primary); color: #fff; }
+.risk-cell.header-side { background: var(--surface2); color: var(--text2); font-size: 10px; display: flex; align-items: center; }
+.risk-cell.low { background: #d4edda; color: #155724; }
+.risk-cell.medium { background: #fff3cd; color: #856404; }
+.risk-cell.high { background: #f8d7da; color: #721c24; }
+.risk-cell.critical { background: #c0392b; color: #fff; }
+
+.risk-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 100px;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.risk-score {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.risk-list { margin-top: 8px; }
+
+.risk-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.risk-item:last-child { border-bottom: none; }
+.risk-item:hover { background: var(--surface2); }
+
+/* ── Records / Near-miss ── */
+.record-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.record-form .full { grid-column: 1 / -1; }
+
+.record-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: box-shadow 0.15s;
+  position: relative;
+}
+
+.record-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.record-card .record-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.record-card .record-date {
+  font-size: 11px;
+  color: var(--text3);
+  margin-left: auto;
+}
+
+.record-card .record-body {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.severity-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.severity-badge.s1 { background: #fde8e8; color: var(--danger); }
+.severity-badge.s2 { background: #fff3cd; color: var(--warning); }
+.severity-badge.s3 { background: #e8f4e8; color: var(--primary); }
+
+/* ── Health Tab ── */
+.health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.health-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.schedule-item .sched-icon {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.schedule-item .sched-name { font-weight: 500; }
+.schedule-item .sched-timing { font-size: 11px; color: var(--text3); }
+.schedule-item .sched-status { margin-left: auto; }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: 12px;
+  width: 600px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+
+.modal-overlay.open .modal { transform: scale(1); }
+
+.modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-family: inherit;
+  transition: all 0.1s;
+}
+.modal-close:hover { background: var(--surface2); }
+
+.modal-body { padding: 20px 24px; }
+.modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ── Tabs within page ── */
+.inner-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.inner-tab {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.inner-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
+.inner-tab:hover { color: var(--primary); }
+
+.inner-tab-content { display: none; }
+.inner-tab-content.active { display: block; }
+
+/* ── Alert banner ── */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.alert.info { background: #e3f0fa; border-left: 3px solid var(--info); color: #1a4a6e; }
+.alert.warning { background: #fef3e2; border-left: 3px solid var(--warning); color: #7a4810; }
+.alert.danger { background: #fde8e8; border-left: 3px solid var(--danger); color: #7a1c1c; }
+.alert.success { background: #e8f4e8; border-left: 3px solid var(--primary); color: #1a4a1a; }
+
+/* ── Print ── */
+@media print {
+  #sidebar { display: none; }
+  #main { margin-left: 0; }
+  .page-header-right, .btn-print-hide { display: none; }
+  .card { box-shadow: none; }
+}
+
+/* ── Mobile Top Bar ── */
+#mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: var(--primary-dark);
+  z-index: 200;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#mobile-topbar .mob-logo {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+#mobile-topbar .mob-logo span {
+  display: block;
+  font-size: 9px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+#hamburger {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.07);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+#hamburger span {
+  display: block;
+  width: 18px; height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+
+#hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+#hamburger.open span:nth-child(2) { opacity: 0; }
+#hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Sidebar overlay on mobile */
+#sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 149;
+}
+
+/* ── Bottom Navigation Bar (mobile only) ── */
+#bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: var(--primary-dark);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  z-index: 1300;
+  align-items: stretch;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+}
+
+.bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 6px 2px;
+  color: rgba(255,255,255,0.45);
+  transition: all 0.15s;
+  border: none;
+  background: transparent;
+  font-family: 'Noto Sans JP', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.bnav-item:active { background: rgba(255,255,255,0.06); }
+
+.bnav-item.active {
+  color: var(--accent);
+}
+
+.bnav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 0 0 3px 3px;
+}
+
+.bnav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bnav-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* More menu sheet */
+#more-sheet-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1100;
+}
+
+#more-sheet-overlay.open { display: block; }
+
+#more-sheet {
+  display: none;
+  position: fixed;
+  bottom: 60px;
+  left: 0; right: 0;
+  background: var(--primary-dark);
+  border-radius: 18px 18px 0 0;
+  z-index: 1200;
+  padding: 12px 0 16px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+}
+
+#more-sheet.open {
+  display: block;
+  animation: slideUp 0.22s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.more-sheet-handle {
+  width: 36px; height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  margin: 0 auto 14px;
+}
+
+.more-sheet-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.35);
+  padding: 0 20px 10px;
+  text-transform: uppercase;
+}
+
+.more-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  padding: 0 8px 8px;
+}
+
+.more-sheet-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.7);
+  transition: all 0.1s;
+  border: none;
+  background: transparent;
+  font-family: 'Noto Sans JP', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.more-sheet-item:active { background: rgba(255,255,255,0.1); }
+
+.more-sheet-item.active {
+  background: rgba(255,255,255,0.08);
+  color: var(--accent);
+}
+
+.more-sheet-item .msi-icon { font-size: 24px; }
+.more-sheet-item .msi-label { font-size: 10px; font-weight: 700; text-align: center; line-height: 1.3; }
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 768px) {
+  /* Show top bar + bottom nav, hide static sidebar */
+  #mobile-topbar { display: flex; }
+  #bottom-nav { display: flex; }
+
+  body { display: block; }
+
+  #sidebar {
+    position: fixed;
+    top: 0; left: -100%;
+    width: 260px;
+    height: 100%;
+    z-index: 150;
+    transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto;
+  }
+
+  #sidebar.mob-open { left: 0; }
+
+  #sidebar-overlay.mob-open { display: block; }
+
+  #main {
+    margin-left: 0;
+    padding-top: 52px;
+    padding-bottom: 60px; /* bottom nav height */
+  }
+
+  .content { padding: 16px 14px; }
+
+  .page-header {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    position: sticky;
+    top: 52px;
+  }
+
+  .page-header-right {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .page-header-right .btn { font-size: 12px; padding: 7px 12px; }
+
+  /* Stats grids → 2 columns */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Dashboard 2-col → 1-col */
+  .dashboard-grid { grid-template-columns: 1fr; }
+
+  /* Form rows → 1 column */
+  .patrol-form .form-row { grid-template-columns: 1fr; }
+  .record-form { grid-template-columns: 1fr; }
+  .health-grid { grid-template-columns: 1fr; }
+  .risk-form-grid { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .compare-grid { grid-template-columns: 1fr; }
+
+  /* Risk matrix scroll */
+  .risk-matrix { overflow-x: auto; min-width: 340px; }
+  .risk-matrix-wrap { overflow-x: auto; }
+
+  /* Risk list → stack */
+  .risk-item {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  .risk-item > div:nth-child(2),
+  .risk-item > div:nth-child(3) { font-size: 11px; color: var(--text3); }
+
+  /* Patrol table scroll */
+  .patrol-table-wrap { overflow-x: auto; }
+  .patrol-table { min-width: 560px; }
+
+  /* Modal: bottom sheet on mobile */
+  .modal-overlay { align-items: flex-end; }
+  .modal {
+    width: 100vw !important;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Card padding tighter */
+  .card { padding: 14px 14px; }
+
+  /* Inner tabs scrollable */
+  .inner-tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 2px; gap: 0; }
+  .inner-tab { flex-shrink: 0; font-size: 12px; padding: 8px 12px; }
+
+  /* Toast lower on mobile */
+  .toast { bottom: 16px; right: 12px; left: 12px; text-align: center; }
+
+  /* Feature grid 2 col */
+  .feature-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Manual card */
+  .manual-card { flex-direction: column; }
+  .manual-card .manual-actions { flex-wrap: wrap; }
+
+  /* Page header title size */
+  .page-header-left h1 { font-size: 16px; }
+
+  /* Save indicator */
+  #save-indicator { font-size: 10px; }
+
+  /* Data management 3-col → 1-col */
+  .data-mgmt-grid { grid-template-columns: 1fr !important; }
+
+  /* Manual page fixes */
+  .manual-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .manual-stats-grid .stat-card:last-child { grid-column: 1 / -1; }
+  .manual-search-row { flex-direction: column; }
+  .manual-search-row input,
+  .manual-search-row select { width: 100%; min-width: unset; }
+  .manual-form-grid { grid-template-columns: 1fr !important; }
+  .manual-form-grid .form-group[style*="grid-column"] { grid-column: auto !important; }
+  .manual-card { flex-direction: column; }
+  .manual-card .manual-icon { width: 36px; height: 36px; font-size: 18px; }
+  .manual-card .manual-actions { flex-wrap: wrap; gap: 6px; }
+  .manual-card .manual-actions .btn { font-size: 11px; padding: 5px 10px; }
+
+  /* Builtin manual cards */
+  .builtin-card-header { gap: 8px; }
+  .builtin-card-header .btn { font-size: 11px; padding: 4px 8px; white-space: nowrap; }
+
+  /* Editor card header wrap */
+  .card-header { flex-wrap: wrap; gap: 8px; }
+
+  /* Section blocks */
+  .section-block-header input { font-size: 13px; }
+  .section-block-body textarea { font-size: 13px; }
+
+  /* Health schedule */
+  .schedule-item { flex-wrap: wrap; }
+
+  /* Checklist note smaller */
+  .check-note { font-size: 10px; }
+
+  /* Stat card value size */
+  .stat-card .stat-value { font-size: 24px; }
+
+  /* Data status bar wrap */
+  #data-status-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  /* Risk matrix legend wrap */
+  .risk-legend { flex-wrap: wrap; gap: 6px; }
+}
+
+@media (max-width: 420px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .page-header-left h1 { font-size: 14px; }
+  .btn { font-size: 12px; }
+  .card { padding: 12px 10px; }
+  .content { padding: 12px 10px; }
+  .stat-card .stat-value { font-size: 20px; }
+  .nav-item { font-size: 13px; padding: 11px 14px; }
+}
+
+/* ── Utils ── */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.text-muted { color: var(--text3); font-size: 12px; }
+.flex { display: flex; align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.ml-auto { margin-left: auto; }
+.mb-16 { margin-bottom: 16px; }
+.fw-700 { font-weight: 700; }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text3);
+}
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+/* ── Notification toast ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+/* ── Manual ── */
+.manual-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.manual-card:hover { box-shadow: 0 4px 16px rgba(26,92,56,0.12); border-color: var(--primary-light); }
+.manual-card .manual-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.manual-card .manual-meta { flex: 1; }
+.manual-card .manual-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.manual-card .manual-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+.manual-card .manual-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+.section-block {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.section-block-header {
+  background: var(--surface2);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.section-block-header input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--text);
+  outline: none;
+}
+.section-block-body { padding: 10px 14px; }
+.section-block-body textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: transparent;
+  min-height: 80px;
+  line-height: 1.7;
+}
+
+/* Manual print view */
+.print-manual { font-family: 'Noto Sans JP', sans-serif; }
+.print-manual .pm-header { border-bottom: 3px solid var(--primary); padding-bottom: 16px; margin-bottom: 20px; }
+.print-manual .pm-title { font-size: 22px; font-weight: 700; color: var(--primary); }
+.print-manual .pm-meta { display: flex; gap: 20px; margin-top: 8px; font-size: 12px; color: var(--text3); }
+.print-manual .pm-section { margin-bottom: 20px; }
+.print-manual .pm-section-title { font-size: 15px; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding: 4px 10px; background: var(--surface2); border-radius: 0 4px 4px 0; margin-bottom: 8px; }
+.print-manual .pm-section-body { font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; padding: 0 8px; }
+.print-manual .pm-footer { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 20px; font-size: 11px; color: var(--text3); display: flex; justify-content: space-between; }
+
+.cat-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.cat-badge.安全作業手順 { background:#e8f4e8; color:var(--primary); }
+.cat-badge.緊急時対応 { background:#fde8e8; color:var(--danger); }
+.cat-badge.保護具・設備 { background:#e3f0fa; color:var(--info); }
+.cat-badge.健康管理 { background:#fce4ec; color:#c2185b; }
+.cat-badge.化学物質 { background:#fff8e1; color:#f57f17; }
+.cat-badge.その他 { background:#f0f0f0; color:var(--text3); }
+
+.builtin-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.builtin-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--surface2);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.builtin-card-header:hover { background: #e4ede0; }
+.builtin-card-body {
+  display: none;
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text2);
+  border-top: 1px solid var(--border);
+}
+.builtin-card-body.open { display: block; }
+.builtin-card-body h4 { font-size: 13px; font-weight: 700; color: var(--primary); margin: 14px 0 4px; }
+.builtin-card-body ul { padding-left: 18px; margin: 4px 0 8px; }
+.builtin-card-body li { margin-bottom: 3px; }
+.builtin-card-body table { width:100%; border-collapse:collapse; font-size:12px; margin:8px 0; }
+.builtin-card-body th { background:var(--primary); color:#fff; padding:6px 10px; text-align:left; }
+.builtin-card-body td { padding:6px 10px; border-bottom:1px solid var(--border); }
+
+/* スマホ：builtin内のテーブルを横スクロール */
+@media (max-width: 768px) {
+  .builtin-card-body { padding: 12px 14px; font-size: 12px; }
+  .builtin-card-body table { display: block; overflow-x: auto; white-space: nowrap; }
+  .builtin-card-body h4 { font-size: 12px; }
+  .builtin-card-body ul { padding-left: 14px; }
+  .builtin-card-body li { font-size: 12px; margin-bottom: 4px; white-space: normal; }
+  .builtin-card-body p { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Mobile Top Bar ── -->
+<div id="mobile-topbar">
+  <button id="hamburger" onclick="toggleSidebar()" aria-label="メニューを開く">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="mob-logo">
+    <span>SAFETY &amp; HEALTH</span>
+    安全衛生推進者管理システム
+  </div>
+  <button class="btn btn-secondary" style="font-size:11px;padding:5px 9px;color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);" onclick="openModal('settings-modal')">⚙️</button>
+</div>
+
+<!-- ── Bottom Navigation Bar ── -->
+<div id="bottom-nav">
+  <button class="bnav-item active" id="bnav-dashboard" onclick="showPageFromNav('dashboard')">
+    <span class="bnav-icon">📊</span>
+    <span class="bnav-label">ホーム</span>
+  </button>
+  <button class="bnav-item" id="bnav-initial" onclick="showPageFromNav('initial')">
+    <span class="bnav-icon">✅</span>
+    <span class="bnav-label">チェック</span>
+  </button>
+  <button class="bnav-item" id="bnav-patrol" onclick="showPageFromNav('patrol')">
+    <span class="bnav-icon">🔍</span>
+    <span class="bnav-label">パトロール</span>
+  </button>
+  <button class="bnav-item" id="bnav-nearmiss" onclick="showPageFromNav('nearmiss')">
+    <span class="bnav-icon">🚨</span>
+    <span class="bnav-label">ヒヤリ</span>
+  </button>
+  <button class="bnav-item" id="bnav-more" onclick="toggleMoreSheet()">
+    <span class="bnav-icon">⋯</span>
+    <span class="bnav-label">その他</span>
+  </button>
+</div>
+
+<!-- ── More Sheet ── -->
+<div id="more-sheet-overlay" onclick="closeMoreSheet()"></div>
+<div id="more-sheet">
+  <div class="more-sheet-handle"></div>
+  <div class="more-sheet-title">その他のメニュー</div>
+  <div class="more-sheet-grid">
+    <button class="more-sheet-item" id="msi-manual" onclick="showPageFromMore('manual')">
+      <span class="msi-icon">📖</span>
+      <span class="msi-label">マニュアル管理</span>
+    </button>
+    <button class="more-sheet-item" id="msi-risk" onclick="showPageFromMore('risk')">
+      <span class="msi-icon">⚠️</span>
+      <span class="msi-label">リスク<br>アセスメント</span>
+    </button>
+    <button class="more-sheet-item" id="msi-health" onclick="showPageFromMore('health')">
+      <span class="msi-icon">❤️</span>
+      <span class="msi-label">健康管理</span>
+    </button>
+    <button class="more-sheet-item" id="msi-education" onclick="showPageFromMore('education')">
+      <span class="msi-icon">📚</span>
+      <span class="msi-label">安全衛生教育</span>
+    </button>
+    <button class="more-sheet-item" id="msi-records" onclick="showPageFromMore('records')">
+      <span class="msi-icon">📁</span>
+      <span class="msi-label">記録・台帳</span>
+    </button>
+    <button class="more-sheet-item" onclick="openModal('settings-modal');closeMoreSheet();">
+      <span class="msi-icon">⚙️</span>
+      <span class="msi-label">設定</span>
+    </button>
+    <button class="more-sheet-item" onclick="exportData();closeMoreSheet();">
+      <span class="msi-icon">📤</span>
+      <span class="msi-label">バックアップ</span>
+    </button>
+    <button class="more-sheet-item" onclick="importData();closeMoreSheet();">
+      <span class="msi-icon">📥</span>
+      <span class="msi-label">復元</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── Sidebar Overlay ── -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-en">Safety & Health</span>
+    <span class="logo-ja">安全衛生推進者<br>管理システム</span>
+    <span class="logo-badge">v1.0</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">メニュー</div>
+    <div class="nav-item" onclick="showPage('manual')">
+      <span class="nav-icon">📖</span> マニュアル管理
+    </div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">📊</span> ダッシュボード
+    </div>
+    <div class="nav-item" onclick="showPage('initial')">
+      <span class="nav-icon">✅</span> 就任時チェックリスト
+    </div>
+    <div class="nav-item" onclick="showPage('patrol')">
+      <span class="nav-icon">🔍</span> 安全パトロール
+    </div>
+    <div class="nav-item" onclick="showPage('risk')">
+      <span class="nav-icon">⚠️</span> リスクアセスメント
+    </div>
+    <div class="nav-item" onclick="showPage('health')">
+      <span class="nav-icon">❤️</span> 健康管理
+    </div>
+    <div class="nav-item" onclick="showPage('nearmiss')">
+      <span class="nav-icon">🚨</span> ヒヤリハット
+    </div>
+    <div class="nav-item" onclick="showPage('education')">
+      <span class="nav-icon">📚</span> 安全衛生教育
+    </div>
+    <div class="nav-item" onclick="showPage('records')">
+      <span class="nav-icon">📁</span> 記録・台帳
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="company-badge">
+      <span class="company-name" id="sidebar-company">会社名を設定してください</span>
+      <span id="sidebar-person">推進者：未設定</span>
+    </div>
+    <div id="save-indicator" style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:8px;min-height:14px;">💾 未保存</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+      <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);" onclick="exportData()">📤 エクスポート（バックアップ）</button>
+      <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);" onclick="importData()">📥 インポート（復元）</button>
+      <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:rgba(255,100,100,0.7);border-color:rgba(255,100,100,0.2);background:rgba(255,255,255,0.04);" onclick="resetAllData()">🗑️ 全データリセット</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div id="main">
+
+  <!-- ── DASHBOARD ── -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>📊 ダッシュボード</h1>
+        <p>安全衛生推進者 活動管理ポータル</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-secondary" onclick="openModal('settings-modal')">⚙️ 設定</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">就任時チェック進捗</div>
+          <div class="stat-value" id="dash-initial-pct">0%</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="dash-initial-bar" style="width:0%"></div></div>
+          <div class="stat-note" id="dash-initial-note">0/0 項目完了</div>
+        </div>
+        <div class="stat-card accent">
+          <div class="stat-label">今月の安全パトロール</div>
+          <div class="stat-value" id="dash-patrol-count">0</div>
+          <div class="stat-note">回実施済み</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">リスクアセスメント件数</div>
+          <div class="stat-value" id="dash-risk-count">0</div>
+          <div class="stat-note">件登録済み</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label">ヒヤリハット（今月）</div>
+          <div class="stat-value" id="dash-near-count">0</div>
+          <div class="stat-note">件報告済み</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="icon-circle" style="background:#e8f4e8;">📋</div>
+                今月の活動予定・期限管理
+              </div>
+            </div>
+            <div id="dashboard-schedule">
+              <div class="check-item" style="cursor:default;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--danger);flex-shrink:0;margin-top:4px;"></div>
+                <div class="check-label">定期健康診断の実施（年1回以上）<span class="check-note">次回実施予定日を確認してください</span></div>
+                <span class="priority-tag high">要確認</span>
+              </div>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;"></div>
+                <div class="check-label">月次安全パトロールの実施<span class="check-note">毎月1回以上実施推奨</span></div>
+                <span class="priority-tag medium">推奨</span>
+              </div>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:4px;"></div>
+                <div class="check-label">安全衛生教育（新入社員・作業変更者）<span class="check-note">該当者が発生次第実施</span></div>
+                <span class="priority-tag low">随時</span>
+              </div>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:4px;"></div>
+                <div class="check-label">ヒヤリハット情報の集計・分析<span class="check-note">月次でまとめて共有</span></div>
+                <span class="priority-tag low">月次</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="icon-circle" style="background:#fde8e8;">⚠️</div>
+                リスクレベル分布
+              </div>
+            </div>
+            <div id="risk-chart-area">
+              <div class="empty-state" style="padding:24px;">
+                <div class="empty-icon">📊</div>
+                <p>リスクアセスメントを登録すると<br>ここにグラフが表示されます</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="icon-circle" style="background:#e3f0fa;">ℹ️</div>
+                クイックガイド
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button class="btn btn-secondary" style="justify-content:flex-start;width:100%;" onclick="showPage('initial')">
+                ✅ 就任時チェックリストを開始する →
+              </button>
+              <button class="btn btn-secondary" style="justify-content:flex-start;width:100%;" onclick="showPage('patrol')">
+                🔍 安全パトロールを記録する →
+              </button>
+              <button class="btn btn-secondary" style="justify-content:flex-start;width:100%;" onclick="showPage('risk')">
+                ⚠️ リスクアセスメントを実施する →
+              </button>
+              <button class="btn btn-secondary" style="justify-content:flex-start;width:100%;" onclick="showPage('nearmiss')">
+                🚨 ヒヤリハットを報告する →
+              </button>
+            </div>
+            <div class="divider"></div>
+            <div class="alert info">
+              <span>ℹ️</span>
+              <div><strong>法的義務のポイント</strong><br>安全衛生推進者は就任後14日以内に選任し、氏名を作業場の見やすい場所に掲示する義務があります。</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">
+              <div class="icon-circle" style="background:#fff3cd;">📅</div>
+              主要法令スケジュール
+            </div>
+            <div style="overflow-x:auto;">
+            <table style="width:100%;font-size:12px;border-collapse:collapse;">
+              <thead>
+                <tr><th style="background:var(--primary);color:#fff;padding:6px 10px;text-align:left;border-radius:4px 0 0 0;">項目</th><th style="background:var(--primary);color:#fff;padding:6px 10px;text-align:left;border-radius:0 4px 0 0;">頻度</th></tr>
+              </thead>
+              <tbody>
+                <tr><td style="padding:7px 10px;border-bottom:1px solid var(--border);">定期健康診断</td><td style="padding:7px 10px;border-bottom:1px solid var(--border);">年1回以上</td></tr>
+                <tr><td style="padding:7px 10px;border-bottom:1px solid var(--border);">特殊健康診断</td><td style="padding:7px 10px;border-bottom:1px solid var(--border);">6ヶ月以内ごと</td></tr>
+                <tr><td style="padding:7px 10px;border-bottom:1px solid var(--border);">作業環境測定</td><td style="padding:7px 10px;border-bottom:1px solid var(--border);">6ヶ月以内ごと（特定作業）</td></tr>
+                <tr><td style="padding:7px 10px;border-bottom:1px solid var(--border);">安全衛生教育（新規）</td><td style="padding:7px 10px;border-bottom:1px solid var(--border);">雇入れ時・作業変更時</td></tr>
+                <tr><td style="padding:7px 10px;">労働災害記録の保管</td><td style="padding:7px 10px;">3年間</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INITIAL CHECKLIST ── -->
+  <div class="page" id="page-initial">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>✅ 就任時チェックリスト</h1>
+        <p>安全衛生推進者に就任したら最初に確認・実施すべき事項</p>
+      </div>
+      <div class="page-header-right">
+        <span class="text-muted" id="initial-progress-text">0/0 完了</span>
+        <button class="btn btn-secondary" onclick="resetChecklist()">🔄 リセット</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="alert warning">
+        <span>⚠️</span>
+        <div><strong>就任後14日以内に必ず実施：</strong>安全衛生推進者の氏名の掲示（作業場の見やすい場所）。労働基準監督署への届出は不要です。</div>
+      </div>
+
+      <div class="card">
+        <div class="progress-bar-wrap" style="height:10px;margin-bottom:16px;">
+          <div class="progress-bar" id="initial-overall-bar" style="width:0%"></div>
+        </div>
+
+        <div id="initial-checklist-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SAFETY PATROL ── -->
+  <div class="page" id="page-patrol">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>🔍 安全パトロール</h1>
+        <p>定期的な作業場の安全点検記録</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-accent" onclick="openModal('patrol-modal')">＋ 新規パトロール記録</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInnerTab('patrol','form')">📝 点検フォーム</button>
+        <button class="inner-tab" onclick="switchInnerTab('patrol','history')">📋 実施記録一覧</button>
+      </div>
+
+      <div class="inner-tab-content active" id="patrol-tab-form">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔍 安全パトロール実施記録</div>
+            <button class="btn btn-primary" onclick="savePatrol()">💾 記録を保存</button>
+          </div>
+
+          <div class="patrol-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>実施日</label>
+                <input type="date" id="patrol-date">
+              </div>
+              <div class="form-group">
+                <label>実施時間</label>
+                <input type="time" id="patrol-time">
+              </div>
+              <div class="form-group">
+                <label>点検箇所・エリア</label>
+                <input type="text" id="patrol-area" placeholder="例：製造ライン A棟1階">
+              </div>
+              <div class="form-group">
+                <label>実施者名</label>
+                <input type="text" id="patrol-person" placeholder="安全衛生推進者名">
+              </div>
+            </div>
+          </div>
+
+          <div class="patrol-table-wrap" style="overflow-x:auto;">
+          <table class="patrol-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">No.</th>
+                <th>点検項目</th>
+                <th style="width:100px;">判定</th>
+                <th>問題点・特記事項</th>
+                <th style="width:100px;">改善期限</th>
+              </tr>
+            </thead>
+            <tbody id="patrol-items-body"></tbody>
+          </table>
+          </div>
+
+          <div class="divider"></div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>総合所見・改善指示事項</label>
+            <textarea id="patrol-summary" placeholder="パトロール全体の所見、改善指示内容、次回の重点確認事項など記入してください。"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-tab-content" id="patrol-tab-history">
+        <div id="patrol-history-list">
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <p>安全パトロールの記録がありません<br>「点検フォーム」から記録を保存してください</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RISK ASSESSMENT ── -->
+  <div class="page" id="page-risk">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>⚠️ リスクアセスメント</h1>
+        <p>作業における危険性・有害性の特定と評価</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-accent" onclick="openModal('risk-modal')">＋ リスク追加</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInnerTab('risk','matrix')">📊 リスクマトリクス</button>
+        <button class="inner-tab" onclick="switchInnerTab('risk','list')">📋 リスク一覧</button>
+        <button class="inner-tab" onclick="switchInnerTab('risk','guide')">📖 実施手順</button>
+      </div>
+
+      <div class="inner-tab-content active" id="risk-tab-matrix">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">リスクレベル判定マトリクス（重篤度 × 発生可能性）</div>
+          <div style="overflow-x:auto;">
+          <div class="risk-matrix">
+            <div class="risk-cell header" style="background:transparent;"></div>
+            <div class="risk-cell header">可能性①<br>低い</div>
+            <div class="risk-cell header">可能性②<br>やや低い</div>
+            <div class="risk-cell header">可能性③<br>やや高い</div>
+            <div class="risk-cell header">可能性④<br>高い</div>
+            <div class="risk-cell header-side">重篤度④<br>致命的</div>
+            <div class="risk-cell high">Ⅲ（8）</div>
+            <div class="risk-cell critical">Ⅳ（12）</div>
+            <div class="risk-cell critical">Ⅳ（16）</div>
+            <div class="risk-cell critical">Ⅳ（16）</div>
+            <div class="risk-cell header-side">重篤度③<br>重大</div>
+            <div class="risk-cell medium">Ⅱ（6）</div>
+            <div class="risk-cell high">Ⅲ（9）</div>
+            <div class="risk-cell high">Ⅲ（12）</div>
+            <div class="risk-cell critical">Ⅳ（12）</div>
+            <div class="risk-cell header-side">重篤度②<br>中程度</div>
+            <div class="risk-cell low">Ⅰ（2）</div>
+            <div class="risk-cell medium">Ⅱ（4）</div>
+            <div class="risk-cell medium">Ⅱ（6）</div>
+            <div class="risk-cell high">Ⅲ（8）</div>
+            <div class="risk-cell header-side">重篤度①<br>軽微</div>
+            <div class="risk-cell low">Ⅰ（1）</div>
+            <div class="risk-cell low">Ⅰ（2）</div>
+            <div class="risk-cell medium">Ⅱ（3）</div>
+            <div class="risk-cell medium">Ⅱ（4）</div>
+          </div>
+          </div>
+          <div class="risk-legend" style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+            <span class="risk-cell low" style="display:inline-block;padding:4px 12px;">Ⅰ：許容リスク（管理継続）</span>
+            <span class="risk-cell medium" style="display:inline-block;padding:4px 12px;">Ⅱ：軽減対策を実施</span>
+            <span class="risk-cell high" style="display:inline-block;padding:4px 12px;">Ⅲ：優先的に対策実施</span>
+            <span class="risk-cell critical" style="display:inline-block;padding:4px 12px;">Ⅳ：即座に対策・作業停止検討</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-tab-content" id="risk-tab-list">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">登録済みリスク一覧</div>
+            <span class="text-muted" id="risk-count-label">0件</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;padding:8px 14px;font-size:11px;font-weight:700;color:var(--text3);border-bottom:2px solid var(--border);">
+            <div>危険源・ハザード</div>
+            <div>重篤度</div>
+            <div>可能性</div>
+            <div>リスクレベル</div>
+            <div></div>
+          </div>
+          <div id="risk-list-body">
+            <div class="empty-state">
+              <div class="empty-icon">⚠️</div>
+              <p>リスクが登録されていません<br>「＋ リスク追加」から登録してください</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-tab-content" id="risk-tab-guide">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;">リスクアセスメント実施手順</div>
+          <div class="checklist-section">
+            <div class="checklist-section-title">🔵 STEP 1｜危険性・有害性の特定（ハザード同定）</div>
+            <div style="padding:8px 14px;font-size:13px;color:var(--text2);line-height:1.7;">
+              <p>• 作業標準書・手順書を確認し、全作業ステップをリストアップする</p>
+              <p>• 各ステップで「怪我をする可能性のある状況」を洗い出す</p>
+              <p>• 機械・化学物質・重量物・高所・電気・騒音などのハザードを特定する</p>
+              <p>• 作業者へのヒアリング、過去の災害・ヒヤリハット事例を参考にする</p>
+            </div>
+          </div>
+          <div class="checklist-section">
+            <div class="checklist-section-title">🟡 STEP 2｜リスクの見積もり</div>
+            <div style="padding:8px 14px;font-size:13px;color:var(--text2);line-height:1.7;">
+              <p>• <strong>重篤度</strong>：①軽微（手当で回復）②中程度（休業1ヶ月未満）③重大（休業1ヶ月以上）④致命的（死亡・障害残存）</p>
+              <p>• <strong>発生可能性</strong>：①低い（まれにしか発生しない）②やや低い③やや高い④高い（頻繁に発生し得る）</p>
+              <p>• リスクレベル = 重篤度 × 発生可能性　でスコアを算出</p>
+            </div>
+          </div>
+          <div class="checklist-section">
+            <div class="checklist-section-title">🔴 STEP 3｜リスク低減措置の検討と実施</div>
+            <div style="padding:8px 14px;font-size:13px;color:var(--text2);line-height:1.7;">
+              <p>優先順位（高い順）：① 設計段階での除去・代替　② 工学的対策（囲い・インターロック等）</p>
+              <p>③ 管理的対策（手順・マニュアル・立入禁止等）　④ 個人用保護具（最後の手段）</p>
+            </div>
+          </div>
+          <div class="checklist-section">
+            <div class="checklist-section-title">🟢 STEP 4｜記録・見直し</div>
+            <div style="padding:8px 14px;font-size:13px;color:var(--text2);line-height:1.7;">
+              <p>• 実施したリスクアセスメントの内容・結果を記録・保管する（義務ではないが強く推奨）</p>
+              <p>• 新たな機械・設備の導入時、作業方法変更時、労働災害発生時に必ず見直す</p>
+              <p>• 定期的（年1回程度）に全体を見直す</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HEALTH ── -->
+  <div class="page" id="page-health">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>❤️ 健康管理</h1>
+        <p>健康診断・ストレスチェック・メンタルヘルス管理</p>
+      </div>
+    </div>
+    <div class="content">
+      <div class="health-grid">
+        <div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">🏥 健康診断スケジュール</div>
+            <div class="health-schedule">
+              <div class="schedule-item">
+                <div class="sched-icon" style="background:#e8f4e8;">🔬</div>
+                <div>
+                  <div class="sched-name">雇入れ時健康診断</div>
+                  <div class="sched-timing">雇入れ時（必須）</div>
+                </div>
+                <span class="status-badge ok sched-status">法定</span>
+              </div>
+              <div class="schedule-item">
+                <div class="sched-icon" style="background:#e3f0fa;">📋</div>
+                <div>
+                  <div class="sched-name">定期健康診断</div>
+                  <div class="sched-timing">1年以内ごとに1回（必須）</div>
+                </div>
+                <span class="status-badge ok sched-status">法定</span>
+              </div>
+              <div class="schedule-item">
+                <div class="sched-icon" style="background:#fde8e8;">⚗️</div>
+                <div>
+                  <div class="sched-name">特殊健康診断</div>
+                  <div class="sched-timing">6ヶ月以内ごとに1回（該当業務）</div>
+                </div>
+                <span class="status-badge ok sched-status">法定</span>
+              </div>
+              <div class="schedule-item">
+                <div class="sched-icon" style="background:#fff3cd;">🧠</div>
+                <div>
+                  <div class="sched-name">ストレスチェック</div>
+                  <div class="sched-timing">1年以内ごとに1回（50人以上は義務）</div>
+                </div>
+                <span class="status-badge na sched-status">推奨</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">📊 健康診断結果管理</div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>実施年月</label>
+              <input type="month" id="health-month">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>受診対象者数</label>
+                <input type="number" id="health-total" placeholder="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>受診者数</label>
+                <input type="number" id="health-done" placeholder="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>異常所見者数</label>
+                <input type="number" id="health-abnormal" placeholder="0" min="0">
+              </div>
+              <div class="form-group">
+                <label>就業制限者数</label>
+                <input type="number" id="health-restrict" placeholder="0" min="0">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveHealthRecord()">💾 記録を保存</button>
+            <div id="health-records" style="margin-top:16px;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">📝 健康管理チェックリスト</div>
+            <div id="health-checklist"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px;">🧠 メンタルヘルス対策</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+              <p><strong>4つのケア</strong></p>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;"></div>
+                <span>① セルフケア（労働者自身による）</span>
+              </div>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;"></div>
+                <span>② ラインによるケア（管理監督者による）</span>
+              </div>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;"></div>
+                <span>③ 事業場内産業保健スタッフ等によるケア</span>
+              </div>
+              <div class="check-item" style="cursor:default;">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;"></div>
+                <span>④ 事業場外資源によるケア</span>
+              </div>
+              <div class="divider"></div>
+              <p style="font-size:12px;"><strong>地域産業保健センター</strong>（50人未満の事業場は無料相談可能）<br>産業医・保健師への相談、メンタルヘルス対策支援</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NEAR MISS ── -->
+  <div class="page" id="page-nearmiss">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>🚨 ヒヤリハット報告</h1>
+        <p>危険事例・ヒヤリハットの記録と分析</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-accent" onclick="openModal('nearmiss-modal')">＋ 新規報告</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="alert info">
+        <span>ℹ️</span>
+        <div><strong>ハインリッヒの法則：</strong>1件の重大災害の背景には、29件の軽傷事故と300件のヒヤリハット（無傷）が潜んでいます。ヒヤリハットを積極的に収集・分析することが労働災害防止の鍵です。</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+        <div class="stat-card danger">
+          <div class="stat-label">重大（ヒヤリ大）</div>
+          <div class="stat-value" id="nm-s1-count">0</div>
+          <div class="stat-note">件</div>
+        </div>
+        <div class="stat-card accent">
+          <div class="stat-label">中程度（ヒヤリ中）</div>
+          <div class="stat-value" id="nm-s2-count">0</div>
+          <div class="stat-note">件</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">軽微（ハッと）</div>
+          <div class="stat-value" id="nm-s3-count">0</div>
+          <div class="stat-note">件</div>
+        </div>
+      </div>
+
+      <div id="nearmiss-list">
+        <div class="empty-state">
+          <div class="empty-icon">🚨</div>
+          <p>ヒヤリハット報告がありません<br>「＋ 新規報告」から登録してください</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EDUCATION ── -->
+  <div class="page" id="page-education">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>📚 安全衛生教育</h1>
+        <p>法令に基づく教育の計画・記録管理</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-accent" onclick="openModal('edu-modal')">＋ 教育記録を追加</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">⚖️ 法令上の教育義務一覧</div>
+        <div style="overflow-x:auto;">
+        <table class="patrol-table">
+          <thead>
+            <tr>
+              <th>教育の種類</th>
+              <th>対象者</th>
+              <th>実施タイミング</th>
+              <th>主な内容</th>
+              <th>法的根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>雇入れ時教育</strong></td>
+              <td>全労働者</td>
+              <td>雇入れ時</td>
+              <td>機械・設備の安全、作業手順、整理整頓、事故時措置など</td>
+              <td>安衛法第59条</td>
+            </tr>
+            <tr>
+              <td><strong>作業内容変更時教育</strong></td>
+              <td>変更対象者</td>
+              <td>作業変更時</td>
+              <td>変更後の作業に関する安全衛生事項</td>
+              <td>安衛法第59条</td>
+            </tr>
+            <tr>
+              <td><strong>特別教育</strong></td>
+              <td>特定危険業務従事者</td>
+              <td>業務従事前</td>
+              <td>フォークリフト、クレーン、溶接、高所作業等（業種・作業による）</td>
+              <td>安衛法第59条第3項</td>
+            </tr>
+            <tr>
+              <td><strong>職長・安全衛生責任者教育</strong></td>
+              <td>新任職長等</td>
+              <td>職長等就任時</td>
+              <td>作業手順・指導・監督、危険源の発見、改善、部下への教育</td>
+              <td>安衛法第60条</td>
+            </tr>
+            <tr>
+              <td><strong>能力向上教育</strong></td>
+              <td>安全衛生推進者等</td>
+              <td>随時</td>
+              <td>安全衛生の最新情報、法改正、専門知識の更新</td>
+              <td>安衛法第19条の2</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📝 教育実施記録一覧</div>
+        </div>
+        <div id="edu-list">
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <p>教育記録がありません<br>「＋ 教育記録を追加」から登録してください</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RECORDS ── -->
+  <div class="page" id="page-records">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>📁 記録・台帳管理</h1>
+        <p>各種記録の一元管理と保管状況の確認</p>
+      </div>
+    </div>
+    <div class="content">
+      <div class="alert info">
+        <span>ℹ️</span>
+        <div><strong>保管期間について：</strong>労働災害の記録は3年間保管義務があります。健康診断の個人票は5年間（特殊健康診断は種類によって最大40年間）保管が必要です。</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">📋 主要記録の保管チェックリスト</div>
+        <div id="records-checklist"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">💾 データ管理</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
+          入力した全データは<strong>ブラウザのlocalStorage（このPC・このブラウザ専用）</strong>に自動保存されます。<br>
+          別のPCやブラウザで使う場合、またはバックアップを取る場合は「エクスポート」でJSONファイルに書き出してください。
+        </div>
+
+        <div id="data-status-bar" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px;">
+          <span id="records-save-status" style="font-weight:700;"></span>
+          <span style="color:var(--text3);">|</span>
+          <span>パトロール記録：<strong id="ds-patrol">0件</strong></span>
+          <span>リスク：<strong id="ds-risk">0件</strong></span>
+          <span>ヒヤリハット：<strong id="ds-near">0件</strong></span>
+          <span>マニュアル：<strong id="ds-manual">0件</strong></span>
+        </div>
+
+        <div class="data-mgmt-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div style="border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:8px;">📤</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px;">エクスポート</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5;">全データをJSONファイルとして<br>ダウンロードします</div>
+            <button class="btn btn-primary" style="width:100%;font-size:12px;" onclick="exportData()">📤 バックアップを保存</button>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:8px;">📥</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px;">インポート</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5;">バックアップJSONファイルから<br>データを復元します</div>
+            <button class="btn btn-secondary" style="width:100%;font-size:12px;" onclick="importData()">📥 ファイルを選択</button>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:8px;">🗑️</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:4px;color:var(--danger);">全データ削除</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5;">すべての記録を消去します<br>（元に戻せません）</div>
+            <button class="btn btn-danger" style="width:100%;font-size:12px;" onclick="resetAllData()">🗑️ リセットする</button>
+          </div>
+        </div>
+
+        <div class="alert warning" style="margin-top:14px;margin-bottom:0;">
+          <span>⚠️</span>
+          <div><strong>ご注意：</strong>localStorageのデータは「ブラウザのキャッシュをクリア」や「シークレットモード」を使うと消える場合があります。定期的に「📤 エクスポート」でJSONファイルにバックアップを取ることを強くおすすめします。</div>
+        </div>
+      </div>
+        <div style="border:1px solid var(--border);border-radius:8px;padding:20px;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:var(--primary);color:#fff;">
+                <th style="padding:10px;text-align:left;">種別</th>
+                <th style="padding:10px;text-align:center;">件数</th>
+                <th style="padding:10px;text-align:left;">最終更新</th>
+                <th style="padding:10px;text-align:left;">備考</th>
+              </tr>
+            </thead>
+            <tbody id="summary-table-body"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:12px;text-align:right;">
+          <button class="btn btn-primary" onclick="window.print()">🖨️ このページを印刷する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ── MANUAL ── -->
+  <div class="page" id="page-manual">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>📖 マニュアル管理</h1>
+        <p>安全衛生マニュアルの作成・閲覧・印刷</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-secondary" onclick="openModal('manual-template-modal')">📋 テンプレート</button>
+        <button class="btn btn-accent" onclick="openManualEditor()">＋ 新規作成</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- ─ タブ（法令解説 → 一覧 → 作成） ─ -->
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInnerTab('manual','builtin')">📋 法令解説</button>
+        <button class="inner-tab" onclick="switchInnerTab('manual','list')">📚 マニュアル一覧</button>
+        <button class="inner-tab" onclick="switchInnerTab('manual','editor')">✏️ 作成・編集</button>
+      </div>
+
+      <!-- 法令解説マニュアル（ビルトイン）★先頭★ -->
+      <div class="inner-tab-content active" id="manual-tab-builtin">
+        <div class="alert info" style="margin-bottom:16px;">
+          <span>ℹ️</span>
+          <div>安全衛生推進者として知っておくべき法令・制度の解説です。タップで開閉できます。「✏️ 編集して保存」で自社用にカスタマイズできます。</div>
+        </div>
+        <div id="builtin-manual-list"></div>
+      </div>
+
+      <!-- マニュアル一覧 -->
+      <div class="inner-tab-content" id="manual-tab-list">
+
+        <!-- 統計カード（スマホは2列） -->
+        <div class="manual-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+          <div class="stat-card">
+            <div class="stat-label">作成済みマニュアル</div>
+            <div class="stat-value" id="manual-total-count">0</div>
+            <div class="stat-note">件</div>
+          </div>
+          <div class="stat-card accent">
+            <div class="stat-label">最終更新</div>
+            <div class="stat-value" style="font-size:16px;line-height:1.2;" id="manual-last-update">—</div>
+            <div class="stat-note">更新日</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">カテゴリ数</div>
+            <div class="stat-value" id="manual-cat-count">0</div>
+            <div class="stat-note">分類</div>
+          </div>
+        </div>
+
+        <!-- 検索 & フィルター（スマホは縦積み） -->
+        <div class="manual-search-row" style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="manual-search" placeholder="🔍 マニュアルを検索..."
+            oninput="filterManuals()"
+            style="flex:1;min-width:160px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;">
+          <select id="manual-cat-filter" onchange="filterManuals()"
+            style="flex:1;min-width:130px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;background:var(--surface);">
+            <option value="">すべてのカテゴリ</option>
+            <option>安全作業手順</option>
+            <option>緊急時対応</option>
+            <option>保護具・設備</option>
+            <option>健康管理</option>
+            <option>化学物質</option>
+            <option>その他</option>
+          </select>
+        </div>
+
+        <div id="manual-list-body">
+          <div class="empty-state">
+            <div class="empty-icon">📖</div>
+            <p>マニュアルがまだ作成されていません<br>「＋ 新規作成」または「📋 テンプレート」から追加してください</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- エディタ -->
+      <div class="inner-tab-content" id="manual-tab-editor">
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap;gap:8px;">
+            <div class="card-title" id="editor-card-title" style="font-size:14px;">✏️ 新規マニュアル作成</div>
+            <div style="display:flex;gap:8px;margin-left:auto;">
+              <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;" onclick="previewManual()">👁️ 確認</button>
+              <button class="btn btn-primary" style="font-size:12px;padding:6px 12px;" onclick="saveManual()">💾 保存</button>
+            </div>
+          </div>
+
+          <!-- 入力フォーム（スマホは1列、PCは2列） -->
+          <div class="manual-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>マニュアルタイトル <span style="color:var(--danger);">*</span></label>
+              <input type="text" id="manual-title" placeholder="例：フォークリフト安全作業手順書">
+            </div>
+            <div class="form-group">
+              <label>カテゴリ</label>
+              <select id="manual-category">
+                <option>安全作業手順</option>
+                <option>緊急時対応</option>
+                <option>保護具・設備</option>
+                <option>健康管理</option>
+                <option>化学物質</option>
+                <option>その他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>改訂番号</label>
+              <input type="text" id="manual-revision" placeholder="例：Rev.1.0">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>対象者</label>
+              <input type="text" id="manual-target" placeholder="例：フォークリフト操作者全員">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:12px;">
+            <label>目的・適用範囲</label>
+            <textarea id="manual-purpose" placeholder="このマニュアルの目的と適用する作業・場所・対象者を記入してください。" style="min-height:60px;"></textarea>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text2);">本文（セクション別）</label>
+            <button class="btn btn-secondary" style="font-size:12px;" onclick="addManualSection()">＋ セクション追加</button>
+          </div>
+          <div id="manual-sections-container"></div>
+
+          <div class="divider"></div>
+          <div class="manual-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>関連法令・根拠</label>
+              <input type="text" id="manual-law" placeholder="例：安衛法第59条">
+            </div>
+            <div class="form-group">
+              <label>作成者</label>
+              <input type="text" id="manual-author" placeholder="作成者名">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── Modals ── -->
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ 基本設定</div>
+      <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>会社名・事業場名</label>
+        <input type="text" id="settings-company" placeholder="○○株式会社">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>安全衛生推進者氏名</label>
+        <input type="text" id="settings-person" placeholder="氏名">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>就任年月日</label>
+        <input type="date" id="settings-date">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>業種</label>
+        <select id="settings-industry">
+          <option value="">選択してください</option>
+          <option>製造業</option>
+          <option>建設業</option>
+          <option>運送業</option>
+          <option>小売業</option>
+          <option>飲食業</option>
+          <option>医療・福祉</option>
+          <option>情報通信業</option>
+          <option>その他</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('settings-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveSettings()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Patrol Modal -->
+<div class="modal-overlay" id="patrol-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 パトロール記録の確認</div>
+      <button class="modal-close" onclick="closeModal('patrol-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="patrol-modal-body">読み込み中...</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('patrol-modal')">閉じる</button>
+      <button class="btn btn-primary" onclick="closeModal('patrol-modal');savePatrol();">保存して閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Risk Modal -->
+<div class="modal-overlay" id="risk-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚠️ リスク登録</div>
+      <button class="modal-close" onclick="closeModal('risk-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>作業名・工程名</label>
+        <input type="text" id="risk-task" placeholder="例：フォークリフト作業、高所作業など">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>危険源・ハザード（何が危ないか）</label>
+        <textarea id="risk-hazard" placeholder="例：フォークリフトと作業員の接触リスク" style="min-height:60px;"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>重篤度</label>
+          <select id="risk-severity" onchange="calcRisk()">
+            <option value="">選択</option>
+            <option value="1">①軽微</option>
+            <option value="2">②中程度</option>
+            <option value="3">③重大</option>
+            <option value="4">④致命的</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>発生可能性</label>
+          <select id="risk-prob" onchange="calcRisk()">
+            <option value="">選択</option>
+            <option value="1">①低い</option>
+            <option value="2">②やや低い</option>
+            <option value="3">③やや高い</option>
+            <option value="4">④高い</option>
+          </select>
+        </div>
+      </div>
+      <div id="risk-result" style="text-align:center;margin:12px 0;padding:12px;border-radius:8px;display:none;font-weight:700;font-size:15px;"></div>
+      <div class="form-group">
+        <label>リスク低減措置</label>
+        <textarea id="risk-measure" placeholder="実施する（した）対策を記入してください。例：走行ルートと歩行者ルートの分離、ミラー設置など" style="min-height:80px;"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>担当者</label>
+          <input type="text" id="risk-owner" placeholder="担当者名">
+        </div>
+        <div class="form-group">
+          <label>対策期限</label>
+          <input type="date" id="risk-deadline">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('risk-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveRisk()">登録する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Near-miss Modal -->
+<div class="modal-overlay" id="nearmiss-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚨 ヒヤリハット報告</div>
+      <button class="modal-close" onclick="closeModal('nearmiss-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>発生日時</label>
+          <input type="datetime-local" id="nm-datetime">
+        </div>
+        <div class="form-group">
+          <label>発生場所</label>
+          <input type="text" id="nm-location" placeholder="例：製造ラインA">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>報告者氏名</label>
+          <input type="text" id="nm-reporter" placeholder="氏名">
+        </div>
+        <div class="form-group">
+          <label>重篤度（もし事故になっていたら）</label>
+          <select id="nm-severity">
+            <option value="s1">重大（死亡・重傷の可能性）</option>
+            <option value="s2">中程度（休業の可能性）</option>
+            <option value="s3">軽微（手当で回復）</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>状況・経緯（何が起きたか）</label>
+        <textarea id="nm-situation" placeholder="いつ、どこで、誰が、何をしていたときに、何が起きたか・起きそうになったか、詳しく記入してください。"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>原因（なぜ起きたか）</label>
+        <textarea id="nm-cause" placeholder="なぜそのような状況が生じたか考えられる原因を記入してください。" style="min-height:60px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>再発防止対策（どうすれば防げるか）</label>
+        <textarea id="nm-measure" placeholder="今後の再発防止のために実施する・提案する対策を記入してください。" style="min-height:60px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('nearmiss-modal')">キャンセル</button>
+      <button class="btn btn-accent" onclick="saveNearmiss()">報告を提出する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Education Modal -->
+<div class="modal-overlay" id="edu-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📚 教育実施記録の追加</div>
+      <button class="modal-close" onclick="closeModal('edu-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>実施日</label>
+          <input type="date" id="edu-date">
+        </div>
+        <div class="form-group">
+          <label>教育の種類</label>
+          <select id="edu-type">
+            <option>雇入れ時教育</option>
+            <option>作業内容変更時教育</option>
+            <option>特別教育</option>
+            <option>職長・安全衛生責任者教育</option>
+            <option>能力向上教育</option>
+            <option>その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>実施時間（時間）</label>
+          <input type="number" id="edu-hours" placeholder="0.5" min="0" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>受講者数</label>
+          <input type="number" id="edu-count" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>教育内容・カリキュラム</label>
+        <textarea id="edu-content" placeholder="実施した教育の内容・テーマを記入してください。"></textarea>
+      </div>
+      <div class="form-group">
+        <label>講師・実施者</label>
+        <input type="text" id="edu-instructor" placeholder="講師名または外部機関名">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('edu-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveEdu()">記録を保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Template Modal -->
+<div class="modal-overlay" id="manual-template-modal">
+  <div class="modal" style="width:620px;">
+    <div class="modal-header">
+      <div class="modal-title">📋 テンプレートを選択</div>
+      <button class="modal-close" onclick="closeModal('manual-template-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">以下のテンプレートを選択してマニュアルを作成できます。選択後、内容を自社に合わせて編集してください。</p>
+      <div id="template-list-body" style="display:grid;gap:10px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('manual-template-modal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Preview Modal -->
+<div class="modal-overlay" id="manual-preview-modal">
+  <div class="modal" style="width:700px;max-height:90vh;">
+    <div class="modal-header">
+      <div class="modal-title" id="preview-modal-title">マニュアルプレビュー</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷</button>
+        <button class="modal-close" onclick="closeModal('manual-preview-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="preview-modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// State — localStorage 自動保存
+// ═══════════════════════════════════════
+const LS_KEY = 'anzen_suishin_v1';
+
+const STATE_DEFAULT = {
+  settings: { company: '', person: '', date: '', industry: '' },
+  initialChecks: {},
+  patrols: [],
+  risks: [],
+  nearmisses: [],
+  educations: [],
+  healthRecords: [],
+  manuals: [],
+  _savedAt: null
+};
+
+// ストレージから読み込み
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(STATE_DEFAULT));
+    const parsed = JSON.parse(raw);
+    // デフォルト値でマージ（キーが足りない場合の保険）
+    return Object.assign(JSON.parse(JSON.stringify(STATE_DEFAULT)), parsed);
+  } catch(e) {
+    console.warn('loadState error', e);
+    return JSON.parse(JSON.stringify(STATE_DEFAULT));
+  }
+}
+
+// ストレージへ保存
+function persistState() {
+  try {
+    state._savedAt = new Date().toISOString();
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    updateSaveIndicator();
+  } catch(e) {
+    console.warn('persistState error', e);
+  }
+}
+
+// 保存日時インジケーター更新
+function updateSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  if (!el || !state._savedAt) return;
+  const d = new Date(state._savedAt);
+  const fmt = d.toLocaleDateString('ja-JP') + ' ' + d.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+  el.textContent = '💾 最終保存：' + fmt;
+  el.style.color = 'rgba(255,255,255,0.6)';
+}
+
+const state = loadState();
+
+// ═══════════════════════════════════════
+// Data Definitions
+// ═══════════════════════════════════════
+
+const INITIAL_CHECKLIST = [
+  {
+    section: '【就任直後】氏名の掲示・周知（法令義務）',
+    icon: '⚡',
+    items: [
+      { id:'i1', label:'安全衛生推進者の氏名を作業場の見やすい場所に掲示する', note:'就任後すぐに実施（法令義務）。腕章・帽子着用でも可', priority:'high' },
+      { id:'i2', label:'全労働者に安全衛生推進者として選任されたことを周知する', note:'朝礼・社内回覧・掲示板などを活用', priority:'high' },
+      { id:'i3', label:'事業者（事業主）から正式な選任書類を受け取る・保管する', note:'口頭ではなく書面で確認', priority:'high' },
+    ]
+  },
+  {
+    section: '【就任1週間以内】現状把握',
+    icon: '📋',
+    items: [
+      { id:'i4', label:'在職の安全衛生関係書類・記録を引き継ぎ確認する', note:'過去の労働災害記録、健康診断結果、安全点検記録など', priority:'high' },
+      { id:'i5', label:'事業場の労働者数・雇用形態（パート・派遣含む）を正確に把握する', note:'有害業務従事者の有無も確認', priority:'high' },
+      { id:'i6', label:'過去に発生した労働災害・ヒヤリハットの事例を確認する', note:'同種災害の防止に向けた対策が実施済みか確認', priority:'medium' },
+      { id:'i7', label:'使用している機械・設備・化学物質のリストを作成・確認する', note:'安全装置・保護具の整備状況を確認', priority:'medium' },
+      { id:'i8', label:'作業場を一通り巡視して危険箇所・改善点を把握する', note:'初回安全パトロールとして実施', priority:'high' },
+    ]
+  },
+  {
+    section: '【就任1ヶ月以内】体制整備',
+    icon: '🏗️',
+    items: [
+      { id:'i9', label:'健康診断の実施状況・直近の結果を確認する', note:'未受診者がいる場合はスケジュールを立てる', priority:'high' },
+      { id:'i10', label:'安全衛生教育（雇入れ時・作業内容変更時）の実施状況を確認する', note:'未実施の場合は速やかに計画・実施する', priority:'high' },
+      { id:'i11', label:'安全衛生活動計画（年間計画）を作成する', note:'定期パトロール・健康診断・教育の年間スケジュールを組む', priority:'medium' },
+      { id:'i12', label:'ヒヤリハット収集の仕組みを整備する', note:'報告書の書式を用意し、提出しやすい環境を作る', priority:'medium' },
+      { id:'i13', label:'関係行政機関・地域産業保健センターの連絡先を把握する', note:'緊急時の相談先として把握しておく', priority:'low' },
+      { id:'i14', label:'労働安全衛生法その他関係法令の基本を学習する', note:'安衛法・各規則の主要条文を確認する', priority:'medium' },
+    ]
+  },
+  {
+    section: '【継続的実施事項】日常・定期業務',
+    icon: '🔄',
+    items: [
+      { id:'i15', label:'定期的な安全パトロール（月1回以上推奨）を実施する', note:'点検結果を記録・保管し改善指示を行う', priority:'medium' },
+      { id:'i16', label:'リスクアセスメントを実施・記録・更新する', note:'新規設備導入・作業変更・災害発生時には必ず見直す', priority:'medium' },
+      { id:'i17', label:'安全衛生情報（法改正・行政通達・業界情報）を定期的に収集する', note:'厚生労働省・労働局のWebサイトを活用', priority:'low' },
+      { id:'i18', label:'安全衛生に係る統計（災害・疾病・休業等）を作成・管理する', note:'記録は3年間保管義務', priority:'medium' },
+      { id:'i19', label:'能力向上のための研修・講習を受講する', note:'事業者は受講機会を与えるよう努める義務がある', priority:'low' },
+    ]
+  }
+];
+
+const PATROL_ITEMS = [
+  { id:'p1', category:'整理整頓・清潔', label:'通路・階段に障害物がなく安全に通行できる状態か' },
+  { id:'p2', category:'整理整頓・清潔', label:'床面の油・水・異物などの滑り・つまずきリスクはないか' },
+  { id:'p3', category:'整理整頓・清潔', label:'資材・製品の積み重ね方は安全か（崩壊・落下の危険はないか）' },
+  { id:'p4', category:'機械・設備', label:'機械の安全装置（カバー・インターロック等）が正常に機能しているか' },
+  { id:'p5', category:'機械・設備', label:'回転部・可動部の危険部分に防護措置があるか' },
+  { id:'p6', category:'機械・設備', label:'機械の点検記録が適切に行われているか' },
+  { id:'p7', category:'電気・配線', label:'電気コード・配線の露出・損傷・タコ足配線はないか' },
+  { id:'p8', category:'電気・配線', label:'配電盤・スイッチ周辺に可燃物がないか' },
+  { id:'p9', category:'化学物質・有害物', label:'化学物質の保管容器に表示（ラベル）があり適切に管理されているか' },
+  { id:'p10', category:'化学物質・有害物', label:'SDS（安全データシート）が整備されており、作業者が閲覧できるか' },
+  { id:'p11', category:'保護具', label:'必要な保護具（ヘルメット・手袋・安全靴・保護眼鏡等）が配備されているか' },
+  { id:'p12', category:'保護具', label:'保護具の点検・交換が適切に行われているか（破損・期限切れはないか）' },
+  { id:'p13', category:'消防・緊急', label:'消火器の設置場所・使用期限・点検状況は適切か' },
+  { id:'p14', category:'消防・緊急', label:'非常口・避難通路が確保されており、案内表示が見えるか' },
+  { id:'p15', category:'消防・緊急', label:'救急箱が設置されており、中身が適切に管理されているか' },
+  { id:'p16', category:'高所・転落', label:'高所作業箇所に手すり・安全ネット等の墜落防止措置があるか' },
+  { id:'p17', category:'高所・転落', label:'はしご・足場・脚立が安全な状態で使用されているか' },
+  { id:'p18', category:'掲示・標識', label:'安全衛生に関する掲示物（禁止・注意事項）が適切に掲示されているか' },
+  { id:'p19', category:'掲示・標識', label:'安全衛生推進者の氏名が見やすい場所に掲示されているか' },
+  { id:'p20', category:'温熱・採光・換気', label:'作業場の照明・採光・換気・温度・湿度は適切か' },
+];
+
+const HEALTH_CHECKLIST = [
+  { id:'h1', label:'定期健康診断を年1回以上実施している', note:'全労働者対象（有害業務従事者は6ヶ月以内ごと）' },
+  { id:'h2', label:'健康診断個人票を5年間保管している', note:'特殊健診は種類による（最大40年）' },
+  { id:'h3', label:'異常所見者に対し医師の意見聴取を行い、適切な措置を取っている', note:'就業上の配慮について医師に確認' },
+  { id:'h4', label:'健康診断の結果を本人に通知している', note:'全結果を書面または電子で通知（義務）' },
+  { id:'h5', label:'高ストレス者にフォローアップを実施している', note:'ストレスチェック実施事業場のみ' },
+  { id:'h6', label:'長時間労働者（月80時間超残業等）への医師・産業医面接制度がある', note:'50人未満は地域産業保健センターを活用' },
+];
+
+const RECORDS_CHECKLIST = [
+  { id:'r1', label:'安全衛生推進者の選任書類・氏名掲示の写真', note:'保管期間：在任中＋α' },
+  { id:'r2', label:'安全パトロール記録（点検表・改善記録）', note:'保管期間：3年間推奨' },
+  { id:'r3', label:'リスクアセスメント実施記録', note:'保管期間：次回見直しまで（継続保管推奨）' },
+  { id:'r4', label:'健康診断個人票（定期・特殊）', note:'保管期間：5年間〜（種類による）' },
+  { id:'r5', label:'健康診断結果の通知記録', note:'保管期間：5年間' },
+  { id:'r6', label:'安全衛生教育の実施記録（受講者名簿含む）', note:'保管期間：3年間' },
+  { id:'r7', label:'ヒヤリハット報告書・再発防止策記録', note:'保管期間：3年間推奨' },
+  { id:'r8', label:'労働者死傷病報告（発生時のみ）', note:'保管期間：3年間（労基署提出後も保管）' },
+  { id:'r9', label:'作業環境測定結果（特定作業のみ）', note:'保管期間：3年間〜（種類による）' },
+  { id:'r10', label:'能力向上教育の受講記録', note:'保管期間：在任中＋α' },
+];
+
+// ═══════════════════════════════════════
+// Mobile Sidebar
+// ═══════════════════════════════════════
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const hb = document.getElementById('hamburger');
+  const isOpen = sb.classList.contains('mob-open');
+  if (isOpen) {
+    sb.classList.remove('mob-open');
+    ov.classList.remove('mob-open');
+    hb.classList.remove('open');
+  } else {
+    sb.classList.add('mob-open');
+    ov.classList.add('mob-open');
+    hb.classList.add('open');
+  }
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mob-open');
+  document.getElementById('sidebar-overlay').classList.remove('mob-open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// ── More Sheet ──
+function toggleMoreSheet() {
+  const sheet = document.getElementById('more-sheet');
+  const ov    = document.getElementById('more-sheet-overlay');
+  if (!sheet || !ov) return;
+
+  const isOpen = sheet.classList.contains('open');
+  if (isOpen) {
+    sheet.classList.remove('open');
+    ov.classList.remove('open');
+    document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+    const bnavDash = document.getElementById('bnav-dashboard');
+    if (bnavDash) bnavDash.classList.add('active');
+  } else {
+    sheet.classList.add('open');
+    ov.classList.add('open');
+    document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+    const moreBtn = document.getElementById('bnav-more');
+    if (moreBtn) moreBtn.classList.add('active');
+  }
+}
+
+function closeMoreSheet() {
+  const sheet = document.getElementById('more-sheet');
+  const ov    = document.getElementById('more-sheet-overlay');
+  if (sheet) sheet.classList.remove('open');
+  if (ov)    ov.classList.remove('open');
+}
+
+// ── ボトムナビからページ遷移 ──
+// ボトムナビ上の5アイテムから
+const BNAV_PAGES = ['dashboard','initial','patrol','nearmiss'];
+
+function showPageFromNav(name) {
+  _navigateTo(name);
+  // ボトムナビのアクティブ更新
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('bnav-' + name);
+  if (target) target.classList.add('active');
+  // モアシートのアクティブ解除
+  document.querySelectorAll('.more-sheet-item').forEach(b => b.classList.remove('active'));
+}
+
+// モアシートから
+const MORE_PAGES = ['manual','risk','health','education','records'];
+
+function showPageFromMore(name) {
+  _navigateTo(name);
+  closeMoreSheet();
+  // ボトムナビのアクティブ解除 → "その他"をアクティブに
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('bnav-more').classList.add('active');
+  // モアシートアクティブ
+  document.querySelectorAll('.more-sheet-item').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('msi-' + name);
+  if (target) target.classList.add('active');
+}
+
+// 共通ページ切り替え（サイドバーも同期）
+function _navigateTo(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  // サイドバーも同期
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + name + "'")) {
+      n.classList.add('active');
+    }
+  });
+  closeSidebar();
+  updateDashboard();
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════
+// Navigation
+// ═══════════════════════════════════════
+function showPage(name) {
+  _navigateTo(name);
+  // ボトムナビ同期
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.more-sheet-item').forEach(b => b.classList.remove('active'));
+  if (BNAV_PAGES.includes(name)) {
+    const btn = document.getElementById('bnav-' + name);
+    if (btn) btn.classList.add('active');
+  } else if (MORE_PAGES.includes(name)) {
+    const moreBtn = document.getElementById('bnav-more');
+    if (moreBtn) moreBtn.classList.add('active');
+    const msiBtn = document.getElementById('msi-' + name);
+    if (msiBtn) msiBtn.classList.add('active');
+  }
+}
+
+// ═══════════════════════════════════════
+// Modal
+// ═══════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'settings-modal') loadSettings();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════
+// Toast
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════
+// Settings
+// ═══════════════════════════════════════
+function loadSettings() {
+  document.getElementById('settings-company').value = state.settings.company;
+  document.getElementById('settings-person').value = state.settings.person;
+  document.getElementById('settings-date').value = state.settings.date;
+  document.getElementById('settings-industry').value = state.settings.industry;
+}
+
+function saveSettings() {
+  state.settings.company = document.getElementById('settings-company').value;
+  state.settings.person = document.getElementById('settings-person').value;
+  state.settings.date = document.getElementById('settings-date').value;
+  state.settings.industry = document.getElementById('settings-industry').value;
+  document.getElementById('sidebar-company').textContent = state.settings.company || '会社名を設定してください';
+  document.getElementById('sidebar-person').textContent = '推進者：' + (state.settings.person || '未設定');
+  if (state.settings.person) {
+    document.getElementById('patrol-person').value = state.settings.person;
+  }
+  closeModal('settings-modal');
+  persistState();
+  showToast('✅ 設定を保存しました');
+}
+
+// ═══════════════════════════════════════
+// Initial Checklist
+// ═══════════════════════════════════════
+function renderInitialChecklist() {
+  const container = document.getElementById('initial-checklist-container');
+  container.innerHTML = '';
+
+  INITIAL_CHECKLIST.forEach(section => {
+    const secDiv = document.createElement('div');
+    secDiv.className = 'checklist-section';
+
+    const title = document.createElement('div');
+    title.className = 'checklist-section-title';
+    title.textContent = section.icon + ' ' + section.section;
+    secDiv.appendChild(title);
+
+    section.items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'check-item' + (state.initialChecks[item.id] ? ' done' : '');
+      row.onclick = () => toggleCheck(item.id, row);
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!state.initialChecks[item.id];
+      cb.onclick = e => e.stopPropagation();
+      cb.onchange = () => toggleCheck(item.id, row);
+
+      const label = document.createElement('div');
+      label.className = 'check-label';
+      label.innerHTML = item.label + '<span class="check-note">' + item.note + '</span>';
+
+      const tag = document.createElement('span');
+      tag.className = 'priority-tag ' + item.priority;
+      tag.textContent = item.priority === 'high' ? '優先' : item.priority === 'medium' ? '重要' : '推奨';
+
+      row.appendChild(cb);
+      row.appendChild(label);
+      row.appendChild(tag);
+      secDiv.appendChild(row);
+    });
+
+    container.appendChild(secDiv);
+  });
+
+  updateInitialProgress();
+}
+
+function toggleCheck(id, row) {
+  state.initialChecks[id] = !state.initialChecks[id];
+  row.querySelector('input[type="checkbox"]').checked = state.initialChecks[id];
+  row.classList.toggle('done', state.initialChecks[id]);
+  updateInitialProgress();
+  persistState();
+}
+
+function updateInitialProgress() {
+  const allItems = INITIAL_CHECKLIST.flatMap(s => s.items);
+  const total = allItems.length;
+  const done = allItems.filter(i => state.initialChecks[i.id]).length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('initial-progress-text').textContent = done + '/' + total + ' 完了';
+  document.getElementById('initial-overall-bar').style.width = pct + '%';
+  updateDashboard();
+}
+
+function resetChecklist() {
+  if (!confirm('チェックリストをリセットしますか？')) return;
+  state.initialChecks = {};
+  renderInitialChecklist();
+  persistState();
+  showToast('🔄 チェックリストをリセットしました');
+}
+
+// ═══════════════════════════════════════
+// Safety Patrol
+// ═══════════════════════════════════════
+function renderPatrolTable() {
+  const tbody = document.getElementById('patrol-items-body');
+  tbody.innerHTML = '';
+
+  let currentCat = '';
+  PATROL_ITEMS.forEach((item, idx) => {
+    if (item.category !== currentCat) {
+      currentCat = item.category;
+      const catRow = document.createElement('tr');
+      catRow.innerHTML = `<td colspan="5" style="background:var(--surface2);font-weight:700;font-size:12px;color:var(--primary);padding:8px 12px;border-bottom:1px solid var(--border);">📂 ${currentCat}</td>`;
+      tbody.appendChild(catRow);
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text3);font-size:11px;">${idx + 1}</td>
+      <td>${item.label}</td>
+      <td>
+        <select class="status-select" id="ps-${item.id}">
+          <option value="">未点検</option>
+          <option value="ok">○ 良好</option>
+          <option value="ng">✕ 問題あり</option>
+          <option value="na">— 該当なし</option>
+        </select>
+      </td>
+      <td><input type="text" style="width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:'Noto Sans JP',sans-serif;" placeholder="問題点・備考" id="pc-${item.id}"></td>
+      <td><input type="date" style="width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" id="pd-${item.id}"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function savePatrol() {
+  const date = document.getElementById('patrol-date').value;
+  const area = document.getElementById('patrol-area').value;
+  if (!date || !area) {
+    alert('実施日と点検箇所を入力してください。');
+    return;
+  }
+
+  const items = PATROL_ITEMS.map(item => ({
+    id: item.id,
+    label: item.label,
+    category: item.category,
+    status: document.getElementById('ps-' + item.id)?.value || '',
+    comment: document.getElementById('pc-' + item.id)?.value || '',
+    deadline: document.getElementById('pd-' + item.id)?.value || '',
+  }));
+
+  const record = {
+    id: Date.now(),
+    date,
+    time: document.getElementById('patrol-time').value,
+    area,
+    person: document.getElementById('patrol-person').value,
+    summary: document.getElementById('patrol-summary').value,
+    items,
+    ngCount: items.filter(i => i.status === 'ng').length,
+    okCount: items.filter(i => i.status === 'ok').length,
+  };
+
+  state.patrols.unshift(record);
+  renderPatrolHistory();
+  updateDashboard();
+  persistState();
+  showToast('✅ 安全パトロール記録を保存しました');
+  closeModal('patrol-modal');
+}
+
+function renderPatrolHistory() {
+  const container = document.getElementById('patrol-history-list');
+  if (state.patrols.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>安全パトロールの記録がありません</p></div>';
+    return;
+  }
+
+  container.innerHTML = state.patrols.map((r, i) => `
+    <div class="record-card">
+      <div class="record-header">
+        <strong style="font-size:14px;">📋 ${r.date} ${r.time || ''}</strong>
+        <span class="status-badge ok">${r.area}</span>
+        <span class="text-muted" style="margin-left:8px;">担当：${r.person || '未記入'}</span>
+        <span class="record-date" style="margin-left:auto;">
+          <span style="color:var(--primary);font-weight:700;">○ ${r.okCount}件</span>&nbsp;
+          <span style="color:var(--danger);font-weight:700;">✕ ${r.ngCount}件</span>
+        </span>
+      </div>
+      ${r.summary ? `<div class="record-body">所見：${r.summary}</div>` : ''}
+      ${r.ngCount > 0 ? `<div style="margin-top:8px;font-size:12px;color:var(--danger);">
+        ⚠️ 問題あり項目：${r.items.filter(i=>i.status==='ng').map(i=>'「'+i.label.substring(0,20)+'...」').join('、')}
+      </div>` : ''}
+      <button class="btn btn-secondary" style="margin-top:8px;font-size:12px;" onclick="deleteRecord('patrols',${i})">🗑️ 削除</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// Risk Assessment
+// ═══════════════════════════════════════
+const RISK_LEVELS = {
+  1:{ label:'Ⅰ 許容リスク', color:'#155724', bg:'#d4edda' },
+  2:{ label:'Ⅰ 許容リスク', color:'#155724', bg:'#d4edda' },
+  3:{ label:'Ⅱ 軽減対策', color:'#856404', bg:'#fff3cd' },
+  4:{ label:'Ⅱ 軽減対策', color:'#856404', bg:'#fff3cd' },
+  6:{ label:'Ⅱ 軽減対策', color:'#856404', bg:'#fff3cd' },
+  8:{ label:'Ⅲ 優先対策', color:'#721c24', bg:'#f8d7da' },
+  9:{ label:'Ⅲ 優先対策', color:'#721c24', bg:'#f8d7da' },
+  12:{ label:'Ⅳ 即時対策', color:'#fff', bg:'#c0392b' },
+  16:{ label:'Ⅳ 即時対策', color:'#fff', bg:'#c0392b' },
+};
+
+function calcRisk() {
+  const sev = parseInt(document.getElementById('risk-severity').value) || 0;
+  const prob = parseInt(document.getElementById('risk-prob').value) || 0;
+  const resultEl = document.getElementById('risk-result');
+
+  if (!sev || !prob) { resultEl.style.display = 'none'; return; }
+
+  const score = sev * prob;
+  const level = RISK_LEVELS[score] || { label:'評価中', color:'var(--text)', bg:'var(--surface2)' };
+  resultEl.style.display = 'block';
+  resultEl.style.background = level.bg;
+  resultEl.style.color = level.color;
+  resultEl.textContent = `リスクスコア：${score}点　→　${level.label}`;
+}
+
+function saveRisk() {
+  const task = document.getElementById('risk-task').value;
+  const hazard = document.getElementById('risk-hazard').value;
+  const sev = parseInt(document.getElementById('risk-severity').value);
+  const prob = parseInt(document.getElementById('risk-prob').value);
+
+  if (!task || !hazard || !sev || !prob) {
+    alert('作業名、危険源、重篤度、発生可能性は必須項目です。');
+    return;
+  }
+
+  const score = sev * prob;
+  const level = RISK_LEVELS[score] || { label:'評価中', color:'var(--text)', bg:'var(--surface2)' };
+
+  state.risks.push({
+    id: Date.now(),
+    task, hazard, sev, prob, score,
+    levelLabel: level.label,
+    levelColor: level.color,
+    levelBg: level.bg,
+    measure: document.getElementById('risk-measure').value,
+    owner: document.getElementById('risk-owner').value,
+    deadline: document.getElementById('risk-deadline').value,
+    date: new Date().toLocaleDateString('ja-JP'),
+  });
+
+  renderRiskList();
+  updateDashboard();
+  closeModal('risk-modal');
+
+  // Reset form
+  ['risk-task','risk-hazard','risk-severity','risk-prob','risk-measure','risk-owner','risk-deadline'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('risk-result').style.display = 'none';
+
+  persistState();
+  showToast('✅ リスクを登録しました');
+}
+
+function renderRiskList() {
+  const body = document.getElementById('risk-list-body');
+  document.getElementById('risk-count-label').textContent = state.risks.length + '件';
+
+  if (state.risks.length === 0) {
+    body.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>リスクが登録されていません</p></div>';
+    return;
+  }
+
+  body.innerHTML = state.risks.map((r, i) => `
+    <div class="risk-item">
+      <div>
+        <div style="font-weight:500;">${r.task}</div>
+        <div style="font-size:12px;color:var(--text3);">${r.hazard.substring(0,50)}${r.hazard.length>50?'...':''}</div>
+        ${r.measure ? `<div style="font-size:11px;color:var(--info);margin-top:2px;">対策：${r.measure.substring(0,40)}...</div>` : ''}
+      </div>
+      <div style="font-size:12px;">重篤度：${r.sev}</div>
+      <div style="font-size:12px;">可能性：${r.prob}</div>
+      <div><span class="risk-score" style="display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;background:${r.levelBg};color:${r.levelColor};">${r.score}点<br>${r.levelLabel}</span></div>
+      <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="deleteRecord('risks',${i})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// Near-miss
+// ═══════════════════════════════════════
+function saveNearmiss() {
+  const situation = document.getElementById('nm-situation').value;
+  if (!situation) { alert('状況・経緯を入力してください。'); return; }
+
+  state.nearmisses.unshift({
+    id: Date.now(),
+    datetime: document.getElementById('nm-datetime').value,
+    location: document.getElementById('nm-location').value,
+    reporter: document.getElementById('nm-reporter').value,
+    severity: document.getElementById('nm-severity').value,
+    situation,
+    cause: document.getElementById('nm-cause').value,
+    measure: document.getElementById('nm-measure').value,
+    date: new Date().toLocaleDateString('ja-JP'),
+  });
+
+  renderNearmissList();
+  updateDashboard();
+  closeModal('nearmiss-modal');
+
+  ['nm-datetime','nm-location','nm-reporter','nm-situation','nm-cause','nm-measure'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('nm-severity').value = 's1';
+
+  persistState();
+  showToast('✅ ヒヤリハット報告を提出しました');
+}
+
+function renderNearmissList() {
+  const container = document.getElementById('nearmiss-list');
+  const s1 = state.nearmisses.filter(n => n.severity === 's1').length;
+  const s2 = state.nearmisses.filter(n => n.severity === 's2').length;
+  const s3 = state.nearmisses.filter(n => n.severity === 's3').length;
+  document.getElementById('nm-s1-count').textContent = s1;
+  document.getElementById('nm-s2-count').textContent = s2;
+  document.getElementById('nm-s3-count').textContent = s3;
+
+  if (state.nearmisses.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🚨</div><p>ヒヤリハット報告がありません</p></div>';
+    return;
+  }
+
+  const sevMap = { s1:{ label:'重大', cls:'s1' }, s2:{ label:'中程度', cls:'s2' }, s3:{ label:'軽微', cls:'s3' } };
+
+  container.innerHTML = state.nearmisses.map((r, i) => {
+    const sev = sevMap[r.severity] || { label:'-', cls:'s3' };
+    return `
+      <div class="record-card">
+        <div class="record-header">
+          <span class="severity-badge ${sev.cls}">${sev.label}</span>
+          <strong style="font-size:13px;">${r.datetime || r.date}</strong>
+          <span style="font-size:12px;color:var(--text3);">${r.location || '場所未記入'}</span>
+          <span class="record-date">報告者：${r.reporter || '匿名'}</span>
+        </div>
+        <div class="record-body">
+          <strong>状況：</strong>${r.situation}
+        </div>
+        ${r.cause ? `<div class="record-body" style="margin-top:4px;"><strong>原因：</strong>${r.cause}</div>` : ''}
+        ${r.measure ? `<div class="record-body" style="margin-top:4px;color:var(--primary);"><strong>対策：</strong>${r.measure}</div>` : ''}
+        <button class="btn btn-secondary" style="margin-top:8px;font-size:12px;" onclick="deleteRecord('nearmisses',${i})">🗑️ 削除</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// Education
+// ═══════════════════════════════════════
+function saveEdu() {
+  const date = document.getElementById('edu-date').value;
+  const content = document.getElementById('edu-content').value;
+  if (!date || !content) { alert('実施日と教育内容を入力してください。'); return; }
+
+  state.educations.unshift({
+    id: Date.now(),
+    date,
+    type: document.getElementById('edu-type').value,
+    hours: document.getElementById('edu-hours').value,
+    count: document.getElementById('edu-count').value,
+    content,
+    instructor: document.getElementById('edu-instructor').value,
+  });
+
+  renderEduList();
+  updateDashboard();
+  closeModal('edu-modal');
+  ['edu-date','edu-hours','edu-count','edu-content','edu-instructor'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  persistState();
+  showToast('✅ 教育記録を保存しました');
+}
+
+function renderEduList() {
+  const container = document.getElementById('edu-list');
+  if (state.educations.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>教育記録がありません</p></div>';
+    return;
+  }
+
+  container.innerHTML = state.educations.map((r, i) => `
+    <div class="record-card">
+      <div class="record-header">
+        <span class="status-badge ok">${r.type}</span>
+        <strong>${r.date}</strong>
+        <span class="text-muted">${r.hours ? r.hours + '時間' : ''} / ${r.count ? r.count + '名受講' : ''}</span>
+        <span class="record-date">講師：${r.instructor || '未記入'}</span>
+      </div>
+      <div class="record-body">${r.content}</div>
+      <button class="btn btn-secondary" style="margin-top:8px;font-size:12px;" onclick="deleteRecord('educations',${i})">🗑️ 削除</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// Health
+// ═══════════════════════════════════════
+function renderHealthChecklist() {
+  const container = document.getElementById('health-checklist');
+  container.innerHTML = HEALTH_CHECKLIST.map(item => `
+    <div class="check-item" onclick="toggleHealthCheck('${item.id}',this)" class="${state.initialChecks['hc_'+item.id]?'done':''}">
+      <input type="checkbox" ${state.initialChecks['hc_'+item.id]?'checked':''} onclick="event.stopPropagation()">
+      <div class="check-label">${item.label}<span class="check-note">${item.note}</span></div>
+    </div>
+  `).join('');
+}
+
+function toggleHealthCheck(id, row) {
+  const key = 'hc_' + id;
+  state.initialChecks[key] = !state.initialChecks[key];
+  row.querySelector('input').checked = state.initialChecks[key];
+  row.classList.toggle('done', state.initialChecks[key]);
+  persistState();
+}
+
+function saveHealthRecord() {
+  const month = document.getElementById('health-month').value;
+  if (!month) { alert('実施年月を入力してください。'); return; }
+
+  state.healthRecords.unshift({
+    month,
+    total: document.getElementById('health-total').value,
+    done: document.getElementById('health-done').value,
+    abnormal: document.getElementById('health-abnormal').value,
+    restrict: document.getElementById('health-restrict').value,
+  });
+
+  renderHealthRecords();
+  persistState();
+  showToast('✅ 健康診断記録を保存しました');
+}
+
+function renderHealthRecords() {
+  const container = document.getElementById('health-records');
+  if (state.healthRecords.length === 0) { container.innerHTML = ''; return; }
+
+  container.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;">保存済み記録</div>' +
+    state.healthRecords.map((r, i) => `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:12px;align-items:center;">
+        <div><strong>${r.month}</strong></div>
+        <div>対象：${r.total}人</div>
+        <div>受診：${r.done}人</div>
+        <div>異常：<span style="color:var(--danger);font-weight:700;">${r.abnormal}人</span></div>
+        <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;" onclick="deleteRecord('healthRecords',${i})">🗑️</button>
+      </div>
+    `).join('');
+}
+
+// ═══════════════════════════════════════
+// Records page
+// ═══════════════════════════════════════
+function renderRecordsChecklist() {
+  const container = document.getElementById('records-checklist');
+  container.innerHTML = RECORDS_CHECKLIST.map(item => `
+    <div class="check-item" onclick="toggleRecordCheck('${item.id}',this)">
+      <input type="checkbox" ${state.initialChecks['rc_'+item.id]?'checked':''} onclick="event.stopPropagation()">
+      <div class="check-label">${item.label}<span class="check-note">${item.note}</span></div>
+    </div>
+  `).join('');
+}
+
+function toggleRecordCheck(id, row) {
+  const key = 'rc_' + id;
+  state.initialChecks[key] = !state.initialChecks[key];
+  row.querySelector('input').checked = state.initialChecks[key];
+  row.classList.toggle('done', state.initialChecks[key]);
+  persistState();
+}
+
+function updateSummaryTable() {
+  const tbody = document.getElementById('summary-table-body');
+  const today = new Date().toLocaleDateString('ja-JP');
+  const rows = [
+    ['安全パトロール実施記録', state.patrols.length + '件', state.patrols[0]?.date || '—', ''],
+    ['リスクアセスメント', state.risks.length + '件', state.risks[0]?.date || '—', ''],
+    ['ヒヤリハット報告', state.nearmisses.length + '件', state.nearmisses[0]?.date || '—', '重大:'+state.nearmisses.filter(n=>n.severity==='s1').length+'件'],
+    ['安全衛生教育記録', state.educations.length + '件', state.educations[0]?.date || '—', ''],
+    ['健康診断記録', state.healthRecords.length + '件', state.healthRecords[0]?.month || '—', ''],
+    ['マニュアル', state.manuals.length + '件', state.manuals[0]?.updatedAt || '—', ''],
+  ];
+
+  if (tbody) {
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td style="padding:10px;border-bottom:1px solid var(--border);">${r[0]}</td>
+        <td style="padding:10px;border-bottom:1px solid var(--border);text-align:center;font-weight:700;">${r[1]}</td>
+        <td style="padding:10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text3);">${r[2]}</td>
+        <td style="padding:10px;border-bottom:1px solid var(--border);font-size:12px;">${r[3]}</td>
+      </tr>
+    `).join('');
+  }
+
+  // データ管理ページの件数バー更新
+  const ds = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  ds('ds-patrol', state.patrols.length + '件');
+  ds('ds-risk', state.risks.length + '件');
+  ds('ds-near', state.nearmisses.length + '件');
+  ds('ds-manual', state.manuals.length + '件');
+
+  // 保存状態表示
+  const statusEl = document.getElementById('records-save-status');
+  if (statusEl) {
+    if (state._savedAt) {
+      const d = new Date(state._savedAt);
+      const fmt = d.toLocaleDateString('ja-JP') + ' ' + d.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+      statusEl.innerHTML = '<span style="color:var(--primary);">✅ 自動保存済み</span>　' + fmt;
+    } else {
+      statusEl.innerHTML = '<span style="color:var(--warning);">⚠️ 未保存</span>';
+    }
+  }
+}
+
+// ═══════════════════════════════════════
+// Dashboard
+// ═══════════════════════════════════════
+function updateDashboard() {
+  const allItems = INITIAL_CHECKLIST.flatMap(s => s.items);
+  const total = allItems.length;
+  const done = allItems.filter(i => state.initialChecks[i.id]).length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+
+  document.getElementById('dash-initial-pct').textContent = pct + '%';
+  document.getElementById('dash-initial-bar').style.width = pct + '%';
+  document.getElementById('dash-initial-note').textContent = done + '/' + total + ' 項目完了';
+  document.getElementById('dash-patrol-count').textContent = state.patrols.length;
+  document.getElementById('dash-risk-count').textContent = state.risks.length;
+  document.getElementById('dash-near-count').textContent = state.nearmisses.length;
+
+  updateSummaryTable();
+}
+
+// ═══════════════════════════════════════
+// Inner Tabs
+// ═══════════════════════════════════════
+function switchInnerTab(page, tab) {
+  const tabs = document.querySelectorAll(`#page-${page} .inner-tab`);
+  const contents = document.querySelectorAll(`#page-${page} .inner-tab-content`);
+  tabs.forEach(t => t.classList.remove('active'));
+  contents.forEach(c => c.classList.remove('active'));
+
+  const activeTab = Array.from(tabs).find(t => t.getAttribute('onclick').includes(`'${tab}'`));
+  if (activeTab) activeTab.classList.add('active');
+  const activeContent = document.getElementById(`${page}-tab-${tab}`);
+  if (activeContent) activeContent.classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// Delete Record
+// ═══════════════════════════════════════
+function deleteRecord(type, index) {
+  if (!confirm('この記録を削除しますか？')) return;
+  state[type].splice(index, 1);
+  if (type === 'patrols') renderPatrolHistory();
+  if (type === 'risks') renderRiskList();
+  if (type === 'nearmisses') renderNearmissList();
+  if (type === 'educations') renderEduList();
+  if (type === 'healthRecords') renderHealthRecords();
+  updateDashboard();
+  persistState();
+  showToast('🗑️ 記録を削除しました');
+}
+
+// ═══════════════════════════════════════
+// Manual Management
+// ═══════════════════════════════════════
+state.manuals = [];
+let editingManualId = null;
+let sectionCount = 0;
+
+const CAT_ICONS = {
+  '安全作業手順': '⚙️',
+  '緊急時対応': '🚨',
+  '保護具・設備': '🦺',
+  '健康管理': '❤️',
+  '化学物質': '⚗️',
+  'その他': '📄',
+};
+
+// ─── Template Data ───
+const MANUAL_TEMPLATES = [
+  {
+    id:'tpl-1',
+    title:'フォークリフト安全作業手順書',
+    category:'安全作業手順',
+    target:'フォークリフト操作者全員',
+    revision:'Rev.1.0',
+    purpose:'フォークリフト作業における重大事故・接触事故を防止し、安全な作業環境を維持するための手順を定める。本マニュアルはフォークリフト免許取得者全員に適用する。',
+    sections:[
+      { title:'1. 作業前点検', body:'【毎日実施】\n• ブレーキの効き具合の確認\n• タイヤの空気圧・損傷確認\n• フォーク・チルトシリンダーの確認\n• ライト・警音器の動作確認\n• 燃料（またはバッテリー残量）の確認\n• 油漏れがないか確認\n\n【点検結果は「フォークリフト日常点検表」に記録すること】' },
+      { title:'2. 走行時の注意事項', body:'• 制限速度（構内：時速10km以内）を厳守する\n• 歩行者優先を徹底し、交差点・コーナーでは必ず一時停止・確認する\n• フォークは地面から15〜30cmの高さで走行する\n• 荷物が前方視界を遮る場合は後進走行を行う\n• 指定の走行ルートを守り、歩行者通路に侵入しない' },
+      { title:'3. 積み卸し作業', body:'• 荷物の重心・重量を確認し、最大積載量を超えないようにする\n• パレットにフォークを確実に差し込んでから持ち上げる\n• マスト傾斜は前傾のまま走行しない（必ず後傾にする）\n• 高所作業（ラック積み付け）は周囲に人がいないことを確認してから行う\n• 荷降ろし後は必ずフォークを水平に戻す' },
+      { title:'4. 禁止事項', body:'• 人を乗せること（フォーク上・バック板上への搭乗禁止）\n• 坂道での横断走行\n• エンジンをかけたまま離席すること\n• 定格荷重を超えた荷物の運搬\n• 安全装置（シートベルト等）を外したままの走行' },
+      { title:'5. 緊急時の対応', body:'• 接触事故が発生した場合：直ちに停車し、負傷者の救護を最優先にする。管理者・安全衛生推進者に報告する。\n• 転倒した場合：フォークリフトから飛び降りずにシートベルトで固定されたまま待機する。\n• 火災が発生した場合：エンジンを停止し、消火器で初期消火を試みる。危険と判断したら直ちに避難する。' },
+    ],
+    law:'労働安全衛生法第59条、フォークリフト構造規格',
+    author:''
+  },
+  {
+    id:'tpl-2',
+    title:'緊急時・災害発生時対応マニュアル',
+    category:'緊急時対応',
+    target:'全従業員',
+    revision:'Rev.1.0',
+    purpose:'労働災害・火災・地震等の緊急事態が発生した際に、迅速かつ適切に対応し、人命・財産への被害を最小限にとどめることを目的とする。',
+    sections:[
+      { title:'1. 労働災害発生時の対応', body:'【発見〜初期対応（0〜5分）】\n① 大声で周囲に知らせる\n② 管理者・安全衛生推進者に連絡する\n③ 119番通報（重傷の場合）\n④ 二次災害防止のため、現場保存・立入禁止措置をとる\n⑤ 応急処置（AEDの使用、止血処置等）\n\n【連絡先一覧】\n• 救急：119番\n• 警察：110番\n• 社内緊急連絡先：（記入してください）\n• 安全衛生推進者：（記入してください）' },
+      { title:'2. 火災発生時の対応', body:'【初期消火】\n• 「火事だ！」と大声で知らせ、非常ベルを鳴らす\n• 初期消火は火が天井に達するまでが限界。それ以上は避難を優先する\n• 消火器は風上から使用し、炎の根元に向けて噴射する\n\n【避難】\n• 落ち着いて避難経路（非常口）を使用する\n• エレベーターは使用禁止\n• ハンカチ等で口と鼻を覆い、姿勢を低くして移動する\n• 避難場所（○○）に集合し、点呼を実施する\n\n• 消防署へ通報（119番）' },
+      { title:'3. 地震発生時の対応', body:'【揺れている間】\n• 机の下に潜り、頭部を守る\n• 火気の傍にいる場合は、揺れが収まってから消火する\n• 窓・棚から離れる\n\n【揺れが収まったら】\n• 出口を確保し、火気を消す\n• 負傷者がいれば救護し、119番通報\n• 指定の避難場所に集合・点呼を実施\n• 上司の指示を待ち、勝手に行動しない\n\n• 被害状況を安全衛生推進者に報告する' },
+      { title:'4. 労働者死傷病報告（法的義務）', body:'【労働基準監督署への報告義務】\n• 休業4日以上：「労働者死傷病報告書」を遅滞なく提出（様式第23号）\n• 休業3日以内：四半期ごとに提出（様式第24号）\n• 死亡・重傷（3名以上）：直ちに電話で報告後、書面提出\n\n※報告を怠ると「不報告」として罰則（50万円以下の罰金）が科される場合があります。\n\n【再発防止】\n• 原因調査を実施し、再発防止策を文書化する\n• 全従業員に周知する' },
+    ],
+    law:'労働安全衛生法第57条・第100条',
+    author:''
+  },
+  {
+    id:'tpl-3',
+    title:'保護具管理・使用マニュアル',
+    category:'保護具・設備',
+    target:'保護具使用者・管理者',
+    revision:'Rev.1.0',
+    purpose:'労働者の安全・健康を守るための保護具の適切な選定・使用・管理方法を定め、保護具の機能を最大限に発揮させることを目的とする。',
+    sections:[
+      { title:'1. 保護具の種類と用途', body:'【頭部の保護】\nヘルメット（墜落物・頭部打撃防止）：高所作業・重量物取扱時は必着\n\n【眼の保護】\n保護眼鏡・シールド（飛散物・化学物質の飛沫）：グラインダー作業・化学物質取扱時\n\n【聴覚の保護】\n耳栓・イヤーマフ（騒音）：85dB以上の作業場\n\n【呼吸器の保護】\n防じんマスク・防毒マスク：粉じん発生作業・化学物質取扱時\n→ 必ず作業に応じた規格のものを選択すること\n\n【手の保護】\n手袋（切り傷・薬品・熱）：用途に応じた素材を選択\n※回転機械作業時は手袋着用禁止（巻き込まれ防止）\n\n【足の保護】\n安全靴（踏み抜き・落下物）：JIS規格品を使用' },
+      { title:'2. 保護具の選定・支給', body:'• 作業内容に応じた適切な規格・性能の保護具を選定する\n• 事業者は保護具を無償で支給する義務がある（安衛法第23条）\n• 個人ごとに貸与するものは、名前を記載して管理する\n• 使用頻度・劣化状況を考慮して定期的に交換する\n\n【交換基準の目安】\n• ヘルメット：使用開始から5年（内装品は3年）\n• 防じんマスクフィルター：目詰まり・使用時間による\n• 保護手袋：破損・劣化が見られたら即交換' },
+      { title:'3. 保護具の点検・管理', body:'【日常点検（使用前）】\n• 破損・亀裂・変形がないか確認する\n• 機能（フィルター交換・締め具の動作等）を確認する\n• 汚れや異臭がある場合は洗浄または交換する\n\n【定期点検（月1回）】\n• 保護具台帳と照合し、数量・状態を確認する\n• 期限切れ・劣化品を廃棄・補充する\n• 保管場所の清潔・整理状態を確認する\n\n【保管方法】\n• 直射日光・高温多湿を避けた専用ロッカーに保管する\n• 薬品・油が付着した保護具は他の保護具と分けて保管する' },
+      { title:'4. 保護具の着用義務', body:'• 保護具の着用は事業者が義務付けた場合、労働者は着用する義務がある（安衛法第26条）\n• 安全衛生推進者は作業中の着用状況を巡視・確認する\n• 未着用の従業員に対しては、着用するよう指導する\n• 繰り返し指導しても着用しない場合は、事業主に報告し対応を求める' },
+    ],
+    law:'労働安全衛生法第23条・第26条、各保護具規格',
+    author:''
+  },
+  {
+    id:'tpl-4',
+    title:'新入社員向け安全衛生教育マニュアル（雇入れ時）',
+    category:'安全作業手順',
+    target:'新規採用者・転職者',
+    revision:'Rev.1.0',
+    purpose:'雇入れ時に実施する安全衛生教育の内容を定め、全新入社員が職場の危険を理解し、安全に作業を開始できるようにすることを目的とする。（根拠：安衛法第59条、安衛則第35条）',
+    sections:[
+      { title:'1. 機械・設備・工具の危険性', body:'• 使用する機械・設備の安全装置（カバー・インターロック等）の目的と、外してはならない理由を説明する\n• 非常停止ボタンの位置と操作方法を実際に確認させる\n• 回転部分・挟まれ箇所・熱・電気などの危険箇所を現場を歩きながら説明する\n• 作業前点検の方法と、異常発見時の報告手順を説明する' },
+      { title:'2. 作業手順と禁止行為', body:'• 自職場の作業標準書・手順書を渡し、内容を説明する\n• 作業手順を省略・変更してはならないことを強調する\n• 主な禁止行為（安全装置の無効化、無断の設備操作等）を具体的に説明する\n• 不明な点があれば作業を中断し、上司に確認するよう指導する' },
+      { title:'3. 保護具の着用', body:'• 必要な保護具の種類と着用方法を実際に装着させながら説明する\n• 保護具の保管場所・支給方法・交換の申請方法を説明する\n• 保護具を着用しなければならない作業と場所を具体的に示す' },
+      { title:'4. 整理整頓・清潔（5S）', body:'【5Sとは：整理・整頓・清掃・清潔・しつけ】\n• 通路・非常口の確保：物を置かないことを徹底する\n• 工具・資材は使用後に指定の場所に戻す\n• 清掃は業務の一部として位置づけ、終業前に実施する\n• 職場の清潔は労働災害防止の基本であることを説明する' },
+      { title:'5. 緊急時の対応（事故・ケガ・火災）', body:'• 救急箱の場所・AEDの場所を実際に見せて説明する\n• 事故・ケガが発生したときの報告経路を説明する（誰に・どう報告するか）\n• 「ヒヤリハット」の概念と報告の重要性を説明し、報告書の書き方を教える\n• 非常口・消火器の位置と使い方を実際に確認させる' },
+      { title:'6. 安全衛生推進者の役割と相談窓口', body:'• 安全衛生推進者（氏名・連絡先）を紹介する\n• 危険を感じたとき・体調不良のときはいつでも相談できることを伝える\n• 職場での安全衛生は「全員参加」で行うことを説明する' },
+    ],
+    law:'労働安全衛生法第59条、安衛則第35条',
+    author:''
+  },
+  {
+    id:'tpl-5',
+    title:'化学物質取扱いマニュアル（SDS活用）',
+    category:'化学物質',
+    target:'化学物質取扱作業者',
+    revision:'Rev.1.0',
+    purpose:'職場で使用する化学物質による健康障害・火災爆発を防止し、安全な取扱方法を定めることを目的とする。',
+    sections:[
+      { title:'1. SDS（安全データシート）の確認', body:'• 化学物質を使用する前に必ずSDSを確認する\n• SDSの保管場所：（記入してください）\n• 確認すべき主な情報：\n  - 物質の危険有害性（発がん性・引火性・毒性等）\n  - 応急処置の方法（吸入・皮膚接触・眼への接触時）\n  - 適切な保護具の種類\n  - 廃棄・保管方法\n\n【令和4年安衛法改正】化学物質のリスクアセスメントが、SDSの交付が義務付けられている全物質に拡大されています。' },
+      { title:'2. 保管・管理', body:'• 化学物質は指定の保管場所（鍵のかかる専用棚等）に保管する\n• 容器には必ずラベル（物質名・危険性・注意事項）を貼付する\n• 可燃性物質と酸化剤は分けて保管する\n• 使用量を記録し、棚卸を定期的に行う\n• 期限切れ・不要な化学物質は適切に廃棄する（産廃業者委託等）' },
+      { title:'3. 取扱時の保護措置', body:'• 化学物質の性状に応じた適切な保護具を着用する\n  - 有機溶剤：防毒マスク（有機ガス用）・化学物質用手袋・保護眼鏡\n  - 酸・アルカリ：耐薬品性手袋・保護眼鏡・フェイスシールド\n  - 粉じん：防じんマスク（適切な等級）\n• 換気（全体換気または局所排気）を十分に行ってから作業を開始する\n• 飲食・喫煙は絶対に行わない' },
+      { title:'4. 事故・漏洩時の対応', body:'【皮膚接触】大量の水で洗い流す（最低15分）。症状が続く場合は医療機関受診。\n【眼への接触】清潔な水で15分以上洗眼後、直ちに眼科受診。\n【吸入】新鮮な空気の場所に移動。意識がない場合は119番通報。\n【漏洩】換気し、点火源を取り除く。乾いた砂・吸収剤で拡散防止。産廃として適切に廃棄する。\n\n※大量漏洩・火災のおそれがある場合は直ちに119番通報し、周囲を避難させる。' },
+    ],
+    law:'労働安全衛生法第57条・57条の2・57条の3、化学物質管理規則',
+    author:''
+  },
+];
+
+// ─── Built-in (Reference) Manuals ───
+const BUILTIN_MANUALS = [
+  {
+    title:'安全衛生推進者の職務と権限（安衛法第12条の2）',
+    icon:'⚖️',
+    body:`
+<h4>概要</h4>
+<p>安全衛生推進者は、常時10人以上50人未満の労働者を使用する事業場で選任が義務付けられています（安衛法第12条の2）。就任後は事業者の指揮命令を受けて以下の8つの職務を担います。</p>
+<h4>8つの職務</h4>
+<ul>
+<li>① 危険または健康障害を防止するための措置</li>
+<li>② 施設・設備・保護具等の点検・整備</li>
+<li>③ 作業環境・方法の点検（作業環境測定を含む）</li>
+<li>④ 安全衛生教育の計画・実施</li>
+<li>⑤ 健康診断・健康保持増進のための措置</li>
+<li>⑥ 労働災害の原因調査・再発防止措置</li>
+<li>⑦ 安全衛生情報の収集・統計作成</li>
+<li>⑧ 関係行政機関への各種報告・届出</li>
+</ul>
+<h4>選任要件</h4>
+<table><tr><th>学歴</th><th>実務経験年数</th></tr><tr><td>大学・高専卒</td><td>1年以上</td></tr><tr><td>高校・中等教育学校卒</td><td>3年以上</td></tr><tr><td>学歴不問</td><td>5年以上</td></tr><tr><td colspan="2">または：養成講習修了者 / 労働安全コンサルタント等</td></tr></table>
+<h4>義務事項</h4>
+<ul><li>就任後14日以内に選任（14日を超えると法令違反）</li><li>作業場の見やすい場所に氏名を掲示（義務）</li><li>労働基準監督署への届出は不要</li></ul>`
+  },
+  {
+    title:'定期健康診断の実施義務と手順（安衛法第66条）',
+    icon:'🏥',
+    body:`
+<h4>実施義務</h4>
+<p>事業者は、常時使用する労働者に対し、1年以内ごとに1回、定期健康診断を実施しなければなりません（安衛法第66条）。</p>
+<h4>定期健康診断の検査項目（安衛則第44条）</h4>
+<ul>
+<li>既往歴・業務歴の調査</li><li>自覚症状・他覚症状の有無</li><li>身長・体重・BMI・腹囲</li>
+<li>視力・聴力（1000Hz・4000Hz）</li><li>胸部エックス線検査（必要に応じ喀痰検査）</li>
+<li>血圧・貧血検査（血色素量・赤血球数）</li><li>肝機能検査（GOT・GPT・γ-GTP）</li>
+<li>血中脂質検査（LDL・HDL・中性脂肪）</li><li>血糖検査・尿検査（尿中糖・蛋白）</li>
+<li>心電図検査</li>
+</ul>
+<h4>事後措置の流れ</h4>
+<table><tr><th>ステップ</th><th>内容</th><th>期限</th></tr>
+<tr><td>結果の通知</td><td>全受診者に書面または電磁的方法で通知</td><td>受診後速やかに</td></tr>
+<tr><td>医師意見聴取</td><td>異常所見者について医師・歯科医師の意見を聴く</td><td>3ヶ月以内</td></tr>
+<tr><td>就業上の措置</td><td>医師の意見に基づき就業制限・配置転換等を検討</td><td>意見聴取後速やかに</td></tr>
+<tr><td>記録の保存</td><td>健康診断個人票を作成・保存</td><td>5年間</td></tr></table>`
+  },
+  {
+    title:'リスクアセスメントの実施義務（安衛法第28条の2）',
+    icon:'⚠️',
+    body:`
+<h4>法的位置づけ</h4>
+<p>事業者は建設物・設備・原材料・ガス等・作業行動・その他業務に起因する危険性・有害性を調査し、リスク低減措置を講じるよう努める義務があります（安衛法第28条の2）。化学物質については令和4年改正で義務化されました。</p>
+<h4>実施のタイミング</h4>
+<ul>
+<li>建設物・設備・原材料等を新規に採用・変更するとき</li>
+<li>作業方法・作業手順を新規採用・変更するとき</li>
+<li>労働災害・ヒヤリハット発生時の再発防止</li>
+<li>その他、定期的に（年1回程度）</li>
+</ul>
+<h4>リスク見積もりの方法（マトリクス法）</h4>
+<table><tr><th>指標</th><th>①</th><th>②</th><th>③</th><th>④</th></tr>
+<tr><td>重篤度</td><td>軽微</td><td>中程度</td><td>重大</td><td>致命的</td></tr>
+<tr><td>発生可能性</td><td>低い</td><td>やや低い</td><td>やや高い</td><td>高い</td></tr></table>
+<p>リスクレベル = 重篤度 × 発生可能性でスコアを算出し、優先順位をつけて対策を実施します。</p>
+<h4>リスク低減の優先順位</h4>
+<ul>
+<li>① 設計段階での除去・代替（最優先）</li>
+<li>② 工学的対策（囲い・インターロック・換気設備等）</li>
+<li>③ 管理的対策（手順書・立入禁止・教育等）</li>
+<li>④ 個人用保護具（最後の手段）</li>
+</ul>`
+  },
+  {
+    title:'安全衛生教育の種類と法的義務（安衛法第59条・60条）',
+    icon:'📚',
+    body:`
+<h4>雇入れ時の安全衛生教育（義務）</h4>
+<p>事業者は労働者を雇い入れた際、または作業内容を変更した際に、担当する作業に関する安全衛生教育を実施しなければなりません（安衛法第59条）。</p>
+<h4>教育すべき事項（安衛則第35条）</h4>
+<ul>
+<li>機械・原材料等の危険性・有害性と取扱方法</li>
+<li>安全装置・有害物抑制装置・保護具の性能と取扱方法</li>
+<li>作業手順</li>
+<li>作業開始時の点検</li>
+<li>発生しうる疾病・その症状・予防方法</li>
+<li>整理整頓・清潔の保持</li>
+<li>事故時等における応急措置・退避</li>
+<li>その他安全衛生に関し必要な事項</li>
+</ul>
+<h4>特別教育が必要な業務（安衛法第59条第3項）</h4>
+<p>クレーン・フォークリフト・溶接・高所作業車・酸素欠乏危険作業・石綿取扱い等、危険・有害業務に就かせる前に専門の特別教育（学科・実技）が必要です。</p>
+<h4>教育記録の保存</h4>
+<p>実施した教育の記録（日時・内容・受講者名）は3年間保存することが推奨されます。</p>`
+  },
+  {
+    title:'労働災害発生時の対応と報告義務',
+    icon:'🚨',
+    body:`
+<h4>発生直後の対応</h4>
+<ul>
+<li>① 傷病者の救護・119番通報（重傷の場合）</li>
+<li>② 二次災害防止（現場保存・立入禁止）</li>
+<li>③ 事業主・安全衛生推進者への報告</li>
+<li>④ 原因の調査開始</li>
+</ul>
+<h4>労働基準監督署への報告義務（安衛法第100条）</h4>
+<table>
+<tr><th>区分</th><th>様式</th><th>提出時期</th></tr>
+<tr><td>死亡・休業4日以上の災害</td><td>様式第23号</td><td>遅滞なく（速やかに）</td></tr>
+<tr><td>休業3日以内の災害</td><td>様式第24号</td><td>四半期ごとに取りまとめて提出</td></tr>
+</table>
+<p>⚠️ 報告を怠った場合：50万円以下の罰金（安衛法第120条）</p>
+<h4>原因調査と再発防止</h4>
+<ul>
+<li>「なぜなぜ分析」等を用いて真因を特定する</li>
+<li>再発防止策を文書化し、全従業員に周知する</li>
+<li>リスクアセスメントを見直し、類似作業への対策も検討する</li>
+<li>記録は3年間保管する</li>
+</ul>`
+  },
+];
+
+function openManualEditor(manualId = null) {
+  editingManualId = manualId;
+  const editor = document.getElementById('manual-tab-editor');
+
+  if (manualId !== null) {
+    const m = state.manuals.find(m => m.id === manualId);
+    if (!m) return;
+    document.getElementById('manual-title').value = m.title;
+    document.getElementById('manual-category').value = m.category;
+    document.getElementById('manual-target').value = m.target || '';
+    document.getElementById('manual-revision').value = m.revision || '';
+    document.getElementById('manual-purpose').value = m.purpose || '';
+    document.getElementById('manual-law').value = m.law || '';
+    document.getElementById('manual-author').value = m.author || '';
+    document.getElementById('editor-card-title').textContent = '✏️ マニュアル編集：' + m.title;
+    renderSections(m.sections || []);
+  } else {
+    document.getElementById('manual-title').value = '';
+    document.getElementById('manual-category').value = '安全作業手順';
+    document.getElementById('manual-target').value = '';
+    document.getElementById('manual-revision').value = 'Rev.1.0';
+    document.getElementById('manual-purpose').value = '';
+    document.getElementById('manual-law').value = '';
+    document.getElementById('manual-author').value = state.settings.person || '';
+    document.getElementById('editor-card-title').textContent = '✏️ 新規マニュアル作成';
+    renderSections([{ title:'1. 目的', body:'' }]);
+  }
+
+  switchInnerTab('manual', 'editor');
+}
+
+function loadTemplateToEditor(tplId) {
+  const tpl = MANUAL_TEMPLATES.find(t => t.id === tplId);
+  if (!tpl) return;
+  editingManualId = null;
+  document.getElementById('manual-title').value = tpl.title;
+  document.getElementById('manual-category').value = tpl.category;
+  document.getElementById('manual-target').value = tpl.target;
+  document.getElementById('manual-revision').value = tpl.revision;
+  document.getElementById('manual-purpose').value = tpl.purpose;
+  document.getElementById('manual-law').value = tpl.law;
+  document.getElementById('manual-author').value = state.settings.person || tpl.author;
+  document.getElementById('editor-card-title').textContent = '✏️ テンプレート編集：' + tpl.title;
+  renderSections(tpl.sections);
+  closeModal('manual-template-modal');
+  switchInnerTab('manual', 'editor');
+  showToast('📋 テンプレートを読み込みました。内容を編集して保存してください。');
+}
+
+function renderTemplateList() {
+  const body = document.getElementById('template-list-body');
+  body.innerHTML = MANUAL_TEMPLATES.map(tpl => `
+    <div style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="loadTemplateToEditor('${tpl.id}')">
+      <div style="width:40px;height:40px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${CAT_ICONS[tpl.category]||'📄'}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px;">${tpl.title}</div>
+        <div style="font-size:11px;color:var(--text3);">対象：${tpl.target}　　セクション数：${tpl.sections.length}つ</div>
+      </div>
+      <span class="cat-badge ${tpl.category}">${tpl.category}</span>
+      <span style="color:var(--primary);font-size:13px;">→</span>
+    </div>
+  `).join('');
+}
+
+function renderSections(sections) {
+  sectionCount = sections.length;
+  const container = document.getElementById('manual-sections-container');
+  container.innerHTML = sections.map((s, i) => `
+    <div class="section-block" id="sec-block-${i}">
+      <div class="section-block-header">
+        <input type="text" value="${s.title||''}" placeholder="セクションタイトル" id="sec-title-${i}">
+        <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;" onclick="removeSection(${i})">✕ 削除</button>
+      </div>
+      <div class="section-block-body">
+        <textarea id="sec-body-${i}" placeholder="この章の内容を記入してください。\n番号リスト：①②③、箇条書き：•、手順書など自由に記入できます。">${s.body||''}</textarea>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addManualSection() {
+  const container = document.getElementById('manual-sections-container');
+  const i = sectionCount++;
+  const div = document.createElement('div');
+  div.className = 'section-block';
+  div.id = 'sec-block-' + i;
+  div.innerHTML = `
+    <div class="section-block-header">
+      <input type="text" placeholder="セクションタイトル（例：2. 作業手順）" id="sec-title-${i}">
+      <button class="btn btn-secondary" style="font-size:11px;padding:3px 8px;" onclick="removeSection(${i})">✕ 削除</button>
+    </div>
+    <div class="section-block-body">
+      <textarea id="sec-body-${i}" placeholder="この章の内容を記入してください。"></textarea>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function removeSection(i) {
+  const el = document.getElementById('sec-block-' + i);
+  if (el) el.remove();
+}
+
+function collectSections() {
+  const sections = [];
+  document.querySelectorAll('#manual-sections-container .section-block').forEach(block => {
+    const id = block.id.replace('sec-block-', '');
+    const title = document.getElementById('sec-title-' + id)?.value || '';
+    const body = document.getElementById('sec-body-' + id)?.value || '';
+    if (title || body) sections.push({ title, body });
+  });
+  return sections;
+}
+
+function saveManual() {
+  const title = document.getElementById('manual-title').value.trim();
+  if (!title) { alert('マニュアルのタイトルを入力してください。'); return; }
+
+  const sections = collectSections();
+  const manual = {
+    id: editingManualId || Date.now(),
+    title,
+    category: document.getElementById('manual-category').value,
+    target: document.getElementById('manual-target').value,
+    revision: document.getElementById('manual-revision').value,
+    purpose: document.getElementById('manual-purpose').value,
+    sections,
+    law: document.getElementById('manual-law').value,
+    author: document.getElementById('manual-author').value,
+    updatedAt: new Date().toLocaleDateString('ja-JP'),
+  };
+
+  if (editingManualId !== null) {
+    const idx = state.manuals.findIndex(m => m.id === editingManualId);
+    if (idx >= 0) state.manuals[idx] = manual;
+    else state.manuals.unshift(manual);
+  } else {
+    state.manuals.unshift(manual);
+  }
+
+  editingManualId = null;
+  renderManualList();
+  updateManualStats();
+  switchInnerTab('manual', 'list');
+  persistState();
+  showToast('✅ マニュアルを保存しました：' + title);
+}
+
+function renderManualList(filter = '') {
+  const body = document.getElementById('manual-list-body');
+  const catFilter = document.getElementById('manual-cat-filter')?.value || '';
+
+  let filtered = state.manuals.filter(m => {
+    const matchText = !filter || m.title.includes(filter) || (m.purpose||'').includes(filter);
+    const matchCat = !catFilter || m.category === catFilter;
+    return matchText && matchCat;
+  });
+
+  if (filtered.length === 0) {
+    body.innerHTML = state.manuals.length === 0
+      ? '<div class="empty-state"><div class="empty-icon">📖</div><p>マニュアルがまだ作成されていません<br>「＋ 新規マニュアル作成」または「テンプレートから作成」でマニュアルを追加してください</p></div>'
+      : '<div class="empty-state"><div class="empty-icon">🔍</div><p>条件に一致するマニュアルが見つかりません</p></div>';
+    return;
+  }
+
+  body.innerHTML = filtered.map(m => `
+    <div class="manual-card">
+      <div class="manual-icon" style="background:var(--surface2);">${CAT_ICONS[m.category]||'📄'}</div>
+      <div class="manual-meta">
+        <div class="manual-name">${m.title}</div>
+        <div class="manual-desc">
+          <span class="cat-badge ${m.category}">${m.category}</span>
+          ${m.revision ? `<span style="margin-left:6px;font-size:10px;color:var(--text3);">${m.revision}</span>` : ''}
+          <span style="margin-left:6px;font-size:10px;color:var(--text3);">更新：${m.updatedAt}</span>
+        </div>
+        ${m.target ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">対象：${m.target}</div>` : ''}
+        ${m.purpose ? `<div style="font-size:12px;color:var(--text3);margin-top:4px;line-height:1.4;">${m.purpose.substring(0,60)}${m.purpose.length>60?'…':''}</div>` : ''}
+        <div class="manual-actions">
+          <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px;" onclick="viewManual(${m.id})">👁️ 閲覧</button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px;" onclick="openManualEditor(${m.id})">✏️ 編集</button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px;" onclick="printManual(${m.id})">🖨️ 印刷</button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px;color:var(--danger);border-color:var(--danger);" onclick="deleteManual(${m.id})">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterManuals() {
+  const filter = document.getElementById('manual-search').value;
+  renderManualList(filter);
+}
+
+function updateManualStats() {
+  document.getElementById('manual-total-count').textContent = state.manuals.length;
+  document.getElementById('manual-last-update').textContent = state.manuals[0]?.updatedAt || '—';
+  const cats = new Set(state.manuals.map(m => m.category));
+  document.getElementById('manual-cat-count').textContent = cats.size;
+}
+
+function viewManual(id) {
+  const m = state.manuals.find(m => m.id === id);
+  if (!m) return;
+  document.getElementById('preview-modal-title').textContent = '📖 ' + m.title;
+  document.getElementById('preview-modal-body').innerHTML = buildManualHTML(m);
+  openModal('manual-preview-modal');
+}
+
+function printManual(id) {
+  const m = state.manuals.find(m => m.id === id);
+  if (!m) return;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+<title>${m.title}</title>
+<style>
+body { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: #1c2b1e; max-width: 800px; margin: 0 auto; padding: 32px; }
+.pm-title { font-size: 22px; font-weight: 700; color: #1a5c38; border-bottom: 3px solid #1a5c38; padding-bottom: 12px; margin-bottom: 8px; }
+.pm-meta { display: flex; gap: 24px; font-size: 11px; color: #7a8f7e; margin-bottom: 24px; }
+.pm-section-title { font-size: 14px; font-weight: 700; color: #1a5c38; border-left: 4px solid #1a5c38; padding: 4px 10px; background: #f0f4ef; margin: 20px 0 8px; }
+.pm-section-body { font-size: 13px; line-height: 1.8; white-space: pre-wrap; padding: 0 8px; }
+.pm-purpose { background: #f0f4ef; border-radius: 6px; padding: 12px 16px; font-size: 13px; line-height: 1.7; margin-bottom: 20px; }
+.pm-footer { border-top: 1px solid #d4ddd0; margin-top: 32px; padding-top: 12px; font-size: 11px; color: #7a8f7e; display: flex; justify-content: space-between; }
+@media print { body { padding: 20px; } }
+</style></head><body>`);
+  w.document.write(buildManualHTML(m, true));
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+}
+
+function buildManualHTML(m, forPrint = false) {
+  return `
+    <div class="print-manual">
+      <div class="pm-header">
+        <div class="pm-title">${m.title}</div>
+        <div class="pm-meta">
+          <span>カテゴリ：${m.category}</span>
+          ${m.target ? `<span>対象者：${m.target}</span>` : ''}
+          ${m.revision ? `<span>${m.revision}</span>` : ''}
+          <span>更新日：${m.updatedAt}</span>
+          ${m.author ? `<span>作成者：${m.author}</span>` : ''}
+        </div>
+      </div>
+      ${m.purpose ? `<div class="pm-purpose"><strong>目的・適用範囲</strong><br>${m.purpose}</div>` : ''}
+      ${(m.sections||[]).map(s => `
+        <div class="pm-section">
+          <div class="pm-section-title">${s.title}</div>
+          <div class="pm-section-body">${s.body||''}</div>
+        </div>
+      `).join('')}
+      ${m.law ? `<div class="pm-footer"><span>関連法令：${m.law}</span><span>${m.updatedAt} 作成</span></div>` : ''}
+    </div>
+  `;
+}
+
+function deleteManual(id) {
+  if (!confirm('このマニュアルを削除しますか？')) return;
+  const idx = state.manuals.findIndex(m => m.id === id);
+  if (idx >= 0) state.manuals.splice(idx, 1);
+  renderManualList();
+  updateManualStats();
+  persistState();
+  showToast('🗑️ マニュアルを削除しました');
+}
+
+function previewManual() {
+  const title = document.getElementById('manual-title').value.trim() || 'プレビュー';
+  const m = {
+    title,
+    category: document.getElementById('manual-category').value,
+    target: document.getElementById('manual-target').value,
+    revision: document.getElementById('manual-revision').value,
+    purpose: document.getElementById('manual-purpose').value,
+    sections: collectSections(),
+    law: document.getElementById('manual-law').value,
+    author: document.getElementById('manual-author').value,
+    updatedAt: new Date().toLocaleDateString('ja-JP'),
+  };
+  document.getElementById('preview-modal-title').textContent = '👁️ プレビュー：' + title;
+  document.getElementById('preview-modal-body').innerHTML = buildManualHTML(m);
+  openModal('manual-preview-modal');
+}
+
+function renderBuiltinManuals() {
+  const container = document.getElementById('builtin-manual-list');
+  container.innerHTML = BUILTIN_MANUALS.map((m, i) => `
+    <div class="builtin-card">
+      <div class="builtin-card-header" onclick="toggleBuiltin(${i})">
+        <span style="font-size:20px;flex-shrink:0;">${m.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;line-height:1.4;word-break:break-all;">${m.title}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;">タップして展開</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button class="btn btn-secondary" style="font-size:11px;padding:4px 8px;white-space:nowrap;"
+            onclick="event.stopPropagation();copyBuiltinToEditor(${i})">✏️ 編集</button>
+          <span id="builtin-arrow-${i}" style="color:var(--text3);font-size:11px;min-width:12px;text-align:center;">▼</span>
+        </div>
+      </div>
+      <div class="builtin-card-body" id="builtin-body-${i}">${m.body}</div>
+    </div>
+  `).join('');
+}
+
+function toggleBuiltin(i) {
+  const body = document.getElementById('builtin-body-' + i);
+  const arrow = document.getElementById('builtin-arrow-' + i);
+  body.classList.toggle('open');
+  arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+}
+
+function copyBuiltinToEditor(i) {
+  const m = BUILTIN_MANUALS[i];
+  editingManualId = null;
+  document.getElementById('manual-title').value = m.title;
+  document.getElementById('manual-category').value = '安全作業手順';
+  document.getElementById('manual-target').value = '全従業員';
+  document.getElementById('manual-revision').value = 'Rev.1.0';
+  document.getElementById('manual-purpose').value = '';
+  document.getElementById('manual-law').value = '';
+  document.getElementById('manual-author').value = state.settings.person || '';
+  document.getElementById('editor-card-title').textContent = '✏️ 法令解説をカスタマイズ：' + m.title;
+  // Strip HTML tags for editing
+  const tmp = document.createElement('div');
+  tmp.innerHTML = m.body;
+  const plainText = tmp.innerText || tmp.textContent || '';
+  renderSections([{ title:'本文', body: plainText.trim() }]);
+  switchInnerTab('manual', 'editor');
+  showToast('📋 法令解説をエディタに読み込みました。内容を自社用に編集して保存してください。');
+}
+
+// ── Manual UI init ──
+// state.manuals は loadState() で復元済みなので上書きしない
+if (!Array.isArray(state.manuals)) state.manuals = [];
+renderTemplateList();
+renderBuiltinManuals();
+
+// ═══════════════════════════════════════
+// Export / Import / Reset
+// ═══════════════════════════════════════
+
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = '安全衛生推進者データ_' + date + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📤 データをエクスポートしました');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (!parsed.settings && !parsed.patrols) {
+          alert('このファイルは有効なデータファイルではありません。');
+          return;
+        }
+        if (!confirm('現在のすべてのデータをインポートデータで上書きします。よろしいですか？')) return;
+        const merged = Object.assign(JSON.parse(JSON.stringify(STATE_DEFAULT)), parsed);
+        Object.keys(merged).forEach(k => { state[k] = merged[k]; });
+        if (!Array.isArray(state.manuals)) state.manuals = [];
+        persistState();
+        rehydrateAll();
+        showToast('📥 データをインポートしました');
+      } catch(err) {
+        alert('ファイルの読み込みに失敗しました。\n' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetAllData() {
+  if (!confirm('⚠️ すべてのデータを削除してリセットします。\nこの操作は元に戻せません。本当によろしいですか？')) return;
+  if (!confirm('最終確認：本当にすべてのデータを消去しますか？')) return;
+  localStorage.removeItem(LS_KEY);
+  const fresh = JSON.parse(JSON.stringify(STATE_DEFAULT));
+  Object.keys(fresh).forEach(k => { state[k] = fresh[k]; });
+  state.manuals = [];
+  rehydrateAll();
+  showToast('🗑️ すべてのデータをリセットしました');
+}
+
+// 全UIを state から再描画
+function rehydrateAll() {
+  document.getElementById('sidebar-company').textContent = state.settings.company || '会社名を設定してください';
+  document.getElementById('sidebar-person').textContent = '推進者：' + (state.settings.person || '未設定');
+  renderInitialChecklist();
+  renderPatrolTable();
+  renderPatrolHistory();
+  renderRiskList();
+  renderNearmissList();
+  renderEduList();
+  renderHealthRecords();
+  renderHealthChecklist();
+  renderRecordsChecklist();
+  renderManualList();
+  updateManualStats();
+  updateDashboard();
+  updateSaveIndicator();
+}
+
+// ═══════════════════════════════════════
+// Init
+// ═══════════════════════════════════════
+function init() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('patrol-date').value = today;
+  document.getElementById('patrol-time').value = new Date().toTimeString().slice(0,5);
+  document.getElementById('nm-datetime').value = new Date().toISOString().slice(0,16);
+  document.getElementById('edu-date').value = today;
+  document.getElementById('health-month').value = today.slice(0,7);
+
+  // localStorage から復元して全画面を再描画
+  rehydrateAll();
+
+  // 保存データがある場合、起動メッセージ
+  if (state._savedAt) {
+    const d = new Date(state._savedAt);
+    const fmt = d.toLocaleDateString('ja-JP') + ' ' + d.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+    showToast('📂 前回のデータを復元しました（' + fmt + '）');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
