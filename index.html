@@ -1436,7 +1436,9 @@ body {
       <span id="sidebar-person">推進者：未設定</span>
     </div>
     <div id="save-indicator" style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:8px;min-height:14px;">💾 未保存</div>
+    <div id="cloud-indicator" style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px;min-height:14px;">☁️ 本社連携：未設定</div>
     <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+      <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:#a3e635;border-color:rgba(163,230,53,0.3);background:rgba(163,230,53,0.08);" onclick="batchSyncNow()">☁️ 本社へ一括送信</button>
       <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);" onclick="exportData()">📤 エクスポート（バックアップ）</button>
       <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);" onclick="importData()">📥 インポート（復元）</button>
       <button class="btn btn-secondary" style="font-size:11px;padding:6px 10px;justify-content:center;width:100%;color:rgba(255,100,100,0.7);border-color:rgba(255,100,100,0.2);background:rgba(255,255,255,0.04);" onclick="resetAllData()">🗑️ 全データリセット</button>
@@ -2313,10 +2315,77 @@ body {
           <option>その他</option>
         </select>
       </div>
+
+      <!-- Google Sheets Integration Section -->
+      <div class="form-group" style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label style="font-weight:700;color:var(--primary);margin-bottom:0;">🏢 本社スプレッドシート連携 (GAS URL)</label>
+          <button type="button" class="btn btn-secondary" style="font-size:10px;padding:3px 8px;color:var(--primary);border-color:var(--primary-light);" onclick="openGasGuideModal()">📖 設定手順・GASコード</button>
+        </div>
+        <input type="url" id="settings-gas-url" placeholder="https://script.google.com/macros/s/.../exec">
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4;">
+          GoogleスプレッドシートのWebアプリURLを入力すると、保存時に本社へ自動同期されます（未設定時は端末内のみに保存）。
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button type="button" class="btn btn-secondary" style="font-size:11px;padding:5px 10px;" onclick="testGasConnection()">🔌 接続テスト</button>
+          <button type="button" class="btn btn-secondary" style="font-size:11px;padding:5px 10px;color:var(--primary);font-weight:600;" onclick="batchSyncNow()">☁️ 全データを今すぐ送信</button>
+        </div>
+        <div id="gas-test-result" style="font-size:11px;margin-top:6px;display:none;padding:6px 10px;border-radius:4px;"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('settings-modal')">キャンセル</button>
       <button class="btn btn-primary" onclick="saveSettings()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAS Setup Guide Modal -->
+<div class="modal-overlay" id="gas-guide-modal">
+  <div class="modal" style="width:640px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;">
+    <div class="modal-header">
+      <div class="modal-title">📖 本社スプレッドシート連携 設定手順</div>
+      <button class="modal-close" onclick="closeModal('gas-guide-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;padding:16px 20px;">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">
+        Google スプレッドシートを用意し、以下の無料スクリプト（GAS）を貼り付けるだけで、全拠点の安全パトロール・リスク・ヒヤリハットがリアルタイムで自動集約されます。
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;font-size:13px;">
+        <div style="background:var(--surface2);padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary);">
+          <strong>ステップ 1: スプレッドシートを新規作成</strong>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">
+            Google ドライブで新規の Google スプレッドシートを作成します（例：<code>全社安全衛生推進統合データベース</code>）。シートの中身は空のままで構いません（自動生成されます）。
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary);">
+          <strong>ステップ 2: Apps Script を開いてコードを貼り付け</strong>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">
+            スプレッドシート上部メニューの「拡張機能」>「Apps Script」をクリック。元のコードを消して下のコードを丸ごと貼り付け、保存（💾アイコン）します。
+          </div>
+        </div>
+
+        <div style="background:var(--surface2);padding:10px 14px;border-radius:8px;border-left:4px solid var(--primary);">
+          <strong>ステップ 3: ウェブアプリとしてデプロイ</strong>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">
+            右上の「デプロイ」>「新しいデプロイ」> 種類の選択（歯車）で「ウェブアプリ」を選択。<br>
+            ・次のユーザーとして実行: <b>自分</b><br>
+            ・アクセスできるユーザー: <b>全員</b>（現場端末から通信を受け付けるため）<br>
+            「デプロイ」を押し、発行された「ウェブアプリの URL」をコピーして本アプリの設定欄に入力します。
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <label style="font-weight:700;font-size:12px;">📋 Apps Script コード（コピーして貼り付けてください）</label>
+        <button type="button" class="btn btn-secondary" style="font-size:11px;padding:3px 10px;" onclick="copyGasCode()">📋 コードをコピー</button>
+      </div>
+      <textarea id="gas-code-area" readonly style="width:100%;height:180px;font-family:monospace;font-size:11px;background:#1e293b;color:#f8fafc;padding:10px;border-radius:6px;border:none;resize:vertical;"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('gas-guide-modal')">閉じる</button>
     </div>
   </div>
 </div>
@@ -2540,7 +2609,7 @@ body {
 const LS_KEY = 'anzen_suishin_v1';
 
 const STATE_DEFAULT = {
-  settings: { company: '', person: '', date: '', industry: '' },
+  settings: { company: '', person: '', date: '', industry: '', gasUrl: '' },
   initialChecks: {},
   patrols: [],
   risks: [],
@@ -2548,7 +2617,8 @@ const STATE_DEFAULT = {
   educations: [],
   healthRecords: [],
   manuals: [],
-  _savedAt: null
+  _savedAt: null,
+  _cloudSyncedAt: null
 };
 
 // ストレージから読み込み
@@ -2558,7 +2628,9 @@ function loadState() {
     if (!raw) return JSON.parse(JSON.stringify(STATE_DEFAULT));
     const parsed = JSON.parse(raw);
     // デフォルト値でマージ（キーが足りない場合の保険）
-    return Object.assign(JSON.parse(JSON.stringify(STATE_DEFAULT)), parsed);
+    const merged = Object.assign(JSON.parse(JSON.stringify(STATE_DEFAULT)), parsed);
+    if (parsed.settings) merged.settings = Object.assign({}, STATE_DEFAULT.settings, parsed.settings);
+    return merged;
   } catch(e) {
     console.warn('loadState error', e);
     return JSON.parse(JSON.stringify(STATE_DEFAULT));
@@ -2584,6 +2656,181 @@ function updateSaveIndicator() {
   const fmt = d.toLocaleDateString('ja-JP') + ' ' + d.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
   el.textContent = '💾 最終保存：' + fmt;
   el.style.color = 'rgba(255,255,255,0.6)';
+}
+
+// 本社クラウド同期インジケーター更新
+function updateCloudIndicator(customMsg, color) {
+  const el = document.getElementById('cloud-indicator');
+  if (!el) return;
+  if (customMsg) {
+    el.textContent = customMsg;
+    el.style.color = color || 'rgba(255,255,255,0.7)';
+    return;
+  }
+  if (!state.settings?.gasUrl) {
+    el.textContent = '☁️ 本社連携：未設定';
+    el.style.color = 'rgba(255,255,255,0.35)';
+  } else if (state._cloudSyncedAt) {
+    const d = new Date(state._cloudSyncedAt);
+    const fmt = d.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+    el.textContent = '☁️ 本社同期済：' + fmt;
+    el.style.color = '#a3e635';
+  } else {
+    el.textContent = '☁️ 本社連携：有効（待機中）';
+    el.style.color = '#74c0fc';
+  }
+}
+
+// ═══════════════════════════════════════
+// Google Sheets (GAS) Cloud Sync Functions
+// ═══════════════════════════════════════
+function syncToCloud(type, recordData) {
+  const url = (state.settings?.gasUrl || '').trim();
+  if (!url) return;
+
+  updateCloudIndicator('☁️ 本社へ送信中...', '#facc15');
+
+  const payload = {
+    action: 'save_record',
+    type: type,
+    meta: {
+      company: state.settings.company || '未設定事業場',
+      person: state.settings.person || '未設定推進者'
+    },
+    data: recordData
+  };
+
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    state._cloudSyncedAt = new Date().toISOString();
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){}
+    updateCloudIndicator();
+  }).catch(err => {
+    console.warn('syncToCloud failed', err);
+    updateCloudIndicator('⚠️ 本社送信失敗 (端末保存済)', '#f87171');
+  });
+}
+
+function batchSyncNow() {
+  const url = (state.settings?.gasUrl || document.getElementById('settings-gas-url')?.value || '').trim();
+  if (!url) {
+    alert('本社スプレッドシート連携URL（GAS URL）が設定されていません。\n「⚙️ 設定」画面から連携URLを入力してください。');
+    openModal('settings-modal');
+    return;
+  }
+
+  const totalCount = (state.patrols?.length || 0) + (state.risks?.length || 0) + 
+                     (state.nearmisses?.length || 0) + (state.educations?.length || 0) + 
+                     (state.healthRecords?.length || 0);
+
+  if (totalCount === 0) {
+    alert('送信する記録データがまだ登録されていません。');
+    return;
+  }
+
+  if (!confirm(`全 ${totalCount} 件の記録データを本社スプレッドシートへ一括送信しますか？`)) {
+    return;
+  }
+
+  updateCloudIndicator('☁️ 一括送信中...', '#facc15');
+  showToast('☁️ 本社スプレッドシートへ送信中...');
+
+  const payload = {
+    action: 'batch_sync',
+    meta: {
+      company: state.settings.company || '未設定事業場',
+      person: state.settings.person || '未設定推進者'
+    },
+    state: {
+      patrols: state.patrols || [],
+      risks: state.risks || [],
+      nearmisses: state.nearmisses || [],
+      educations: state.educations || [],
+      healthRecords: state.healthRecords || []
+    }
+  };
+
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    state._cloudSyncedAt = new Date().toISOString();
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){}
+    updateCloudIndicator();
+    showToast('✅ 全データを本社スプレッドシートへ送信しました！');
+  }).catch(err => {
+    console.warn('batchSyncNow failed', err);
+    updateCloudIndicator('⚠️ 送信エラー (端末保存済)', '#f87171');
+    alert('送信中にエラーが発生しました。インターネット接続と連携URLをご確認ください。');
+  });
+}
+
+function testGasConnection() {
+  const url = (document.getElementById('settings-gas-url')?.value || '').trim();
+  const resEl = document.getElementById('gas-test-result');
+  if (!url) {
+    alert('連携URLを入力してください。');
+    return;
+  }
+  if (!resEl) return;
+
+  resEl.style.display = 'block';
+  resEl.style.background = 'var(--surface2)';
+  resEl.style.color = 'var(--text2)';
+  resEl.textContent = '⏳ 接続テストを実行中...';
+
+  // GET で疎通テスト
+  const testUrl = url + (url.includes('?') ? '&' : '?') + 'action=ping&_t=' + Date.now();
+  fetch(testUrl)
+    .then(r => r.json())
+    .then(data => {
+      resEl.style.background = '#dcfce7';
+      resEl.style.color = '#166534';
+      resEl.textContent = '✅ 接続成功！ スプレッドシートとの通信が確認できました。';
+    })
+    .catch(() => {
+      // no-cors POST でも再テスト試行
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ping' })
+      }).then(() => {
+        resEl.style.background = '#dcfce7';
+        resEl.style.color = '#166534';
+        resEl.textContent = '✅ 送信疎通成功！（POST通信が確認できました）';
+      }).catch(err => {
+        resEl.style.background = '#fee2e2';
+        resEl.style.color = '#991b1b';
+        resEl.textContent = '❌ 接続に失敗しました。URLとデプロイ設定（アクセスできるユーザー: 全員）をご確認ください。';
+      });
+    });
+}
+
+function openGasGuideModal() {
+  openModal('gas-guide-modal');
+  const codeArea = document.getElementById('gas-code-area');
+  if (codeArea && !codeArea.value) {
+    codeArea.value = GAS_BACKEND_CODE;
+  }
+}
+
+function copyGasCode() {
+  const codeArea = document.getElementById('gas-code-area');
+  if (!codeArea) return;
+  codeArea.select();
+  navigator.clipboard.writeText(codeArea.value).then(() => {
+    showToast('📋 GASコードをクリップボードにコピーしました！');
+  }).catch(() => {
+    document.execCommand('copy');
+    showToast('📋 GASコードをコピーしました！');
+  });
 }
 
 const state = loadState();
@@ -2832,10 +3079,14 @@ function showToast(msg) {
 // Settings
 // ═══════════════════════════════════════
 function loadSettings() {
-  document.getElementById('settings-company').value = state.settings.company;
-  document.getElementById('settings-person').value = state.settings.person;
-  document.getElementById('settings-date').value = state.settings.date;
-  document.getElementById('settings-industry').value = state.settings.industry;
+  document.getElementById('settings-company').value = state.settings.company || '';
+  document.getElementById('settings-person').value = state.settings.person || '';
+  document.getElementById('settings-date').value = state.settings.date || '';
+  document.getElementById('settings-industry').value = state.settings.industry || '';
+  const gasEl = document.getElementById('settings-gas-url');
+  if (gasEl) gasEl.value = state.settings.gasUrl || '';
+  const resEl = document.getElementById('gas-test-result');
+  if (resEl) resEl.style.display = 'none';
 }
 
 function saveSettings() {
@@ -2843,6 +3094,8 @@ function saveSettings() {
   state.settings.person = document.getElementById('settings-person').value;
   state.settings.date = document.getElementById('settings-date').value;
   state.settings.industry = document.getElementById('settings-industry').value;
+  state.settings.gasUrl = (document.getElementById('settings-gas-url')?.value || '').trim();
+
   document.getElementById('sidebar-company').textContent = state.settings.company || '会社名を設定してください';
   document.getElementById('sidebar-person').textContent = '推進者：' + (state.settings.person || '未設定');
   if (state.settings.person) {
@@ -2850,6 +3103,7 @@ function saveSettings() {
   }
   closeModal('settings-modal');
   persistState();
+  updateCloudIndicator();
   showToast('✅ 設定を保存しました');
 }
 
@@ -2994,6 +3248,7 @@ function savePatrol() {
   renderPatrolHistory();
   updateDashboard();
   persistState();
+  syncToCloud('patrol', record);
   showToast('✅ 安全パトロール記録を保存しました');
   closeModal('patrol-modal');
 }
@@ -3093,6 +3348,7 @@ function saveRisk() {
   document.getElementById('risk-result').style.display = 'none';
 
   persistState();
+  syncToCloud('risk', state.risks[state.risks.length - 1]);
   showToast('✅ リスクを登録しました');
 }
 
@@ -3150,6 +3406,7 @@ function saveNearmiss() {
   document.getElementById('nm-severity').value = 's1';
 
   persistState();
+  syncToCloud('nearmiss', state.nearmisses[0]);
   showToast('✅ ヒヤリハット報告を提出しました');
 }
 
@@ -3216,6 +3473,7 @@ function saveEdu() {
     if (el) el.value = '';
   });
   persistState();
+  syncToCloud('education', state.educations[0]);
   showToast('✅ 教育記録を保存しました');
 }
 
@@ -3275,6 +3533,7 @@ function saveHealthRecord() {
 
   renderHealthRecords();
   persistState();
+  syncToCloud('health', state.healthRecords[0]);
   showToast('✅ 健康診断記録を保存しました');
 }
 
@@ -4047,7 +4306,11 @@ function rehydrateAll() {
   updateManualStats();
   updateDashboard();
   updateSaveIndicator();
+  updateCloudIndicator();
 }
+
+const GAS_BACKEND_CODE = "/**\n * \u5b89\u5168\u885b\u751f\u63a8\u9032\u8005\u7ba1\u7406\u30b7\u30b9\u30c6\u30e0 - Google Apps Script (GAS) \u30d0\u30c3\u30af\u30a8\u30f3\u30c9\n * \n * \u3010\u4f7f\u3044\u65b9\u3011\n * 1. Google \u30c9\u30e9\u30a4\u30d6\u3067\u300c\u65b0\u898f\u300d>\u300cGoogle \u30b9\u30d7\u30ec\u30c3\u30c9\u30b7\u30fc\u30c8\u300d\u3092\u4f5c\u6210\u3057\u307e\u3059\uff08\u30d5\u30a1\u30a4\u30eb\u540d\u306f\u4efb\u610f\uff1a\u4f8b\u300c\u5168\u793e\u5b89\u5168\u885b\u751f\u63a8\u9032\u7d71\u5408\u30c7\u30fc\u30bf\u30d9\u30fc\u30b9\u300d\uff09\u3002\n * 2. \u30e1\u30cb\u30e5\u30fc\u30d0\u30fc\u306e\u300c\u62e1\u5f35\u6a5f\u80fd\u300d>\u300cApps Script\u300d\u3092\u30af\u30ea\u30c3\u30af\u3057\u307e\u3059\u3002\n * 3. \u65e2\u5b58\u306e\u30b3\u30fc\u30c9\u3092\u5168\u3066\u6d88\u53bb\u3057\u3001\u3053\u306e\u30d5\u30a1\u30a4\u30eb\u306e\u5185\u5bb9\u3092\u4e38\u3054\u3068\u8cbc\u308a\u4ed8\u3051\u3066\u4fdd\u5b58\uff08\u30d5\u30ed\u30c3\u30d4\u30fc\u30a2\u30a4\u30b3\u30f3\uff09\u3057\u307e\u3059\u3002\n * 4. \u753b\u9762\u53f3\u4e0a\u306e\u300c\u30c7\u30d7\u30ed\u30a4\u300d>\u300c\u65b0\u3057\u3044\u30c7\u30d7\u30ed\u30a4\u300d\u3092\u30af\u30ea\u30c3\u30af\u3057\u307e\u3059\u3002\n * 5. \u6b6f\u8eca\u30a2\u30a4\u30b3\u30f3\u3092\u30af\u30ea\u30c3\u30af\u3057\u300c\u30a6\u30a7\u30d6\u30a2\u30d7\u30ea\u300d\u3092\u9078\u629e\u3057\u307e\u3059\u3002\n * 6. \u8a2d\u5b9a\uff1a\n *    - \u6b21\u306e\u30e6\u30fc\u30b6\u30fc\u3068\u3057\u3066\u5b9f\u884c: \u300c\u81ea\u5206\u300d\n *    - \u30a2\u30af\u30bb\u30b9\u3067\u304d\u308b\u30e6\u30fc\u30b6\u30fc: \u300c\u5168\u54e1\u300d\uff08\u203b\u793e\u5916\u30fb\u73fe\u5834\u7aef\u672b\u304b\u3089\u306e\u30c7\u30fc\u30bf\u9001\u4fe1\u3092\u53d7\u3051\u4ed8\u3051\u308b\u305f\u3081\uff09\n * 7. \u300c\u30c7\u30d7\u30ed\u30a4\u300d\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3001\u30a2\u30af\u30bb\u30b9\u3092\u627f\u8a8d\u3057\u307e\u3059\u3002\n * 8. \u767a\u884c\u3055\u308c\u305f\u300c\u30a6\u30a7\u30d6\u30a2\u30d7\u30ea\u306e URL\u300d\uff08https://script.google.com/macros/s/.../exec\uff09\u3092\u30b3\u30d4\u30fc\u3057\u3066\u3001\n *    \u5b89\u5168\u885b\u751f\u63a8\u9032\u8005\u30a2\u30d7\u30ea\u306e\u300c\u57fa\u672c\u8a2d\u5b9a\u300d>\u300c\u672c\u793e\u30b9\u30d7\u30ec\u30c3\u30c9\u30b7\u30fc\u30c8\u9023\u643aURL\u300d\u306b\u8cbc\u308a\u4ed8\u3051\u307e\u3059\u3002\n */\n\nfunction doPost(e) {\n  try {\n    const raw = e.postData.contents;\n    const payload = JSON.parse(raw);\n    const ss = SpreadsheetApp.getActiveSpreadsheet();\n\n    // \u63a5\u7d9a\u30c6\u30b9\u30c8 (Ping)\n    if (payload.action === 'ping') {\n      return jsonResponse({ status: 'success', message: 'Google Apps Script\u63a5\u7d9a\u306b\u6210\u529f\u3057\u307e\u3057\u305f\uff01' });\n    }\n\n    // \u5358\u4e00\u30ec\u30b3\u30fc\u30c9\u4fdd\u5b58\n    if (payload.action === 'save_record') {\n      handleSaveRecord(ss, payload);\n      return jsonResponse({ status: 'success', message: '\u8a18\u9332\u304c\u6b63\u5e38\u306b\u30b9\u30d7\u30ec\u30c3\u30c9\u30b7\u30fc\u30c8\u3078\u4fdd\u5b58\u3055\u308c\u307e\u3057\u305f\u3002' });\n    }\n\n    // \u4e00\u62ec\u540c\u671f (Batch Sync)\n    if (payload.action === 'batch_sync') {\n      handleBatchSync(ss, payload);\n      return jsonResponse({ status: 'success', message: '\u5168\u30c7\u30fc\u30bf\u306e\u4e00\u62ec\u540c\u671f\u304c\u5b8c\u4e86\u3057\u307e\u3057\u305f\u3002' });\n    }\n\n    return jsonResponse({ status: 'error', message: 'Unknown action: ' + payload.action });\n  } catch (err) {\n    return jsonResponse({ status: 'error', message: err.toString() });\n  }\n}\n\nfunction doGet(e) {\n  // \u30d6\u30e9\u30a6\u30b6\u3067\u76f4\u63a5\u958b\u3044\u305f\u5834\u5408\u3084\u758e\u901a\u30c6\u30b9\u30c8\u7528\n  const action = e.parameter.action;\n  const ss = SpreadsheetApp.getActiveSpreadsheet();\n\n  if (action === 'get_nearmisses') {\n    // \u5168\u793e\u30d2\u30e4\u30ea\u30cf\u30c3\u30c8\u4e00\u89a7\u306e\u53d6\u5f97\n    const sheet = ss.getSheetByName('\u30d2\u30e4\u30ea\u30cf\u30c3\u30c8\u5831\u544a');\n    if (!sheet) return jsonResponse({ status: 'success', data: [] });\n    const values = sheet.getDataRange().getValues();\n    if (values.length <= 1) return jsonResponse({ status: 'success', data: [] });\n    \n    const headers = values[0];\n    const rows = values.slice(1).map(row => {\n      const obj = {};\n      headers.forEach((h, idx) => obj[h] = row[idx]);\n      return obj;\n    });\n    return jsonResponse({ status: 'success', data: rows });\n  }\n\n  return jsonResponse({\n    status: 'success',\n    message: '\u5b89\u5168\u885b\u751f\u63a8\u9032\u8005\u7ba1\u7406\u30b7\u30b9\u30c6\u30e0 GAS Web API \u306f\u6b63\u5e38\u306b\u7a3c\u50cd\u3057\u3066\u3044\u307e\u3059\u3002'\n  });\n}\n\n/**\n * \u5358\u4e00\u30ec\u30b3\u30fc\u30c9\u306e\u632f\u308a\u5206\u3051\u4fdd\u5b58\n */\nfunction handleSaveRecord(ss, payload) {\n  const type = payload.type;\n  const meta = payload.meta || {};\n  const data = payload.data || {};\n  const nowStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');\n  const company = meta.company || '\u672a\u8a2d\u5b9a\u4e8b\u696d\u5834';\n  const person = meta.person || '\u672a\u8a2d\u5b9a\u63a8\u9032\u8005';\n\n  if (type === 'patrol') {\n    const sheet = getOrCreateSheet(ss, '\u8077\u5834\u5de1\u8996\u30fb\u30d1\u30c8\u30ed\u30fc\u30eb', [\n      '\u53d7\u4fe1\u65e5\u6642', '\u4e8b\u696d\u5834\u540d', '\u5b89\u5168\u885b\u751f\u63a8\u9032\u8005', '\u5b9f\u65bd\u65e5', '\u5b9f\u65bd\u6642\u523b', '\u70b9\u691c\u30a8\u30ea\u30a2', '\u70b9\u691c\u62c5\u5f53\u8005', '\u5408\u683c\u4ef6\u6570', '\u554f\u984c\u4ef6\u6570', '\u8981\u662f\u6b63\u9805\u76ee', '\u6240\u898b\u30fb\u30b5\u30de\u30ea\u30fc'\n    ]);\n    const ngList = (data.items || []).filter(i => i.status === 'ng').map(i => i.label).join(' / ');\n    sheet.appendRow([\n      nowStr, company, person, data.date || '', data.time || '', data.area || '', data.person || '',\n      data.okCount || 0, data.ngCount || 0, ngList, data.summary || ''\n    ]);\n  } else if (type === 'risk') {\n    const sheet = getOrCreateSheet(ss, '\u30ea\u30b9\u30af\u30a2\u30bb\u30b9\u30e1\u30f3\u30c8', [\n      '\u53d7\u4fe1\u65e5\u6642', '\u4e8b\u696d\u5834\u540d', '\u5b89\u5168\u885b\u751f\u63a8\u9032\u8005', '\u767b\u9332\u65e5', '\u4f5c\u696d\u540d\u30fb\u5de5\u7a0b', '\u5371\u967a\u6e90\u30fb\u72b6\u614b', '\u91cd\u7be4\u5ea6(1-4)', '\u53ef\u80fd\u6027(1-4)', '\u30ea\u30b9\u30af\u30b9\u30b3\u30a2', '\u30ea\u30b9\u30af\u5224\u5b9a', '\u662f\u6b63\u63aa\u7f6e\u30fb\u5bfe\u7b56', '\u62c5\u5f53\u8005', '\u5bfe\u7b56\u671f\u9650'\n    ]);\n    sheet.appendRow([\n      nowStr, company, person, data.date || '', data.task || '', data.hazard || '',\n      data.sev || '', data.prob || '', data.score || '', data.levelLabel || '',\n      data.measure || '', data.owner || '', data.deadline || ''\n    ]);\n  } else if (type === 'nearmiss') {\n    const sheet = getOrCreateSheet(ss, '\u30d2\u30e4\u30ea\u30cf\u30c3\u30c8\u5831\u544a', [\n      '\u53d7\u4fe1\u65e5\u6642', '\u4e8b\u696d\u5834\u540d', '\u5b89\u5168\u885b\u751f\u63a8\u9032\u8005', '\u767a\u751f\u65e5\u6642', '\u767a\u751f\u5834\u6240', '\u5831\u544a\u8005', '\u5207\u8feb\u5ea6\u30fb\u91cd\u7be4\u5ea6', '\u72b6\u6cc1\u30fb\u7d4c\u7def', '\u63a8\u5b9a\u539f\u56e0', '\u518d\u767a\u9632\u6b62\u5bfe\u7b56'\n    ]);\n    const sevLabel = { 's1': '\u8efd\u5fae\uff08\u3072\u3084\u308a\u3068\u3057\u305f\uff09', 's2': '\u4e2d\u5ea6\uff08\u602a\u6211\u306e\u4e00\u6b69\u624b\u524d\uff09', 's3': '\u91cd\u5927\uff08\u91cd\u5927\u707d\u5bb3\u306e\u53ef\u80fd\u6027\uff09' }[data.severity] || data.severity || '';\n    sheet.appendRow([\n      nowStr, company, person, data.datetime || '', data.location || '', data.reporter || '',\n      sevLabel, data.situation || '', data.cause || '', data.measure || ''\n    ]);\n  } else if (type === 'education') {\n    const sheet = getOrCreateSheet(ss, '\u5b89\u5168\u885b\u751f\u6559\u80b2', [\n      '\u53d7\u4fe1\u65e5\u6642', '\u4e8b\u696d\u5834\u540d', '\u5b89\u5168\u885b\u751f\u63a8\u9032\u8005', '\u5b9f\u65bd\u5e74\u6708\u65e5', '\u6559\u80b2\u533a\u5206', '\u30c6\u30fc\u30de\u30fb\u7814\u4fee\u540d', '\u5bfe\u8c61\u8005\u30fb\u53c2\u52a0\u4eba\u6570', '\u8b1b\u5e2b\u30fb\u62c5\u5f53\u8005', '\u6559\u80b2\u5185\u5bb9\u30fb\u6240\u898b'\n    ]);\n    sheet.appendRow([\n      nowStr, company, person, data.date || '', data.category || '', data.title || '',\n      data.participants || '', data.instructor || '', data.content || ''\n    ]);\n  } else if (type === 'health') {\n    const sheet = getOrCreateSheet(ss, '\u5065\u5eb7\u7ba1\u7406\u8a18\u9332', [\n      '\u53d7\u4fe1\u65e5\u6642', '\u4e8b\u696d\u5834\u540d', '\u5b89\u5168\u885b\u751f\u63a8\u9032\u8005', '\u5b9f\u65bd\u65e5', '\u533a\u5206', '\u5bfe\u8c61\u8005\u30fb\u4ef6\u6570', '\u5224\u5b9a\u30fb\u7d50\u679c\u6982\u8981', '\u4e8b\u5f8c\u63aa\u7f6e\u30fb\u914d\u616e\u4e8b\u9805', '\u5099\u8003'\n    ]);\n    sheet.appendRow([\n      nowStr, company, person, data.date || '', data.category || '', data.target || '',\n      data.result || '', data.action || '', data.note || ''\n    ]);\n  }\n}\n\n/**\n * \u4e00\u62ec\u540c\u671f\u51e6\u7406\n */\nfunction handleBatchSync(ss, payload) {\n  const meta = payload.meta || {};\n  const state = payload.state || {};\n\n  if (Array.isArray(state.patrols)) {\n    state.patrols.forEach(item => handleSaveRecord(ss, { type: 'patrol', meta: meta, data: item }));\n  }\n  if (Array.isArray(state.risks)) {\n    state.risks.forEach(item => handleSaveRecord(ss, { type: 'risk', meta: meta, data: item }));\n  }\n  if (Array.isArray(state.nearmisses)) {\n    state.nearmisses.forEach(item => handleSaveRecord(ss, { type: 'nearmiss', meta: meta, data: item }));\n  }\n  if (Array.isArray(state.educations)) {\n    state.educations.forEach(item => handleSaveRecord(ss, { type: 'education', meta: meta, data: item }));\n  }\n  if (Array.isArray(state.healthRecords)) {\n    state.healthRecords.forEach(item => handleSaveRecord(ss, { type: 'health', meta: meta, data: item }));\n  }\n}\n\n/**\n * \u6307\u5b9a\u540d\u306e\u30b7\u30fc\u30c8\u3092\u53d6\u5f97\uff08\u5b58\u5728\u3057\u306a\u3051\u308c\u3070\u4f5c\u6210\u3057\u30d8\u30c3\u30c0\u30fc\u884c\u3092\u8a2d\u5b9a\uff06\u30b9\u30bf\u30a4\u30eb\u9069\u7528\uff09\n */\nfunction getOrCreateSheet(ss, name, headers) {\n  let sheet = ss.getSheetByName(name);\n  if (!sheet) {\n    sheet = ss.insertSheet(name);\n    // \u30d8\u30c3\u30c0\u30fc\u8ffd\u52a0\n    sheet.appendRow(headers);\n    const headerRange = sheet.getRange(1, 1, 1, headers.length);\n    headerRange.setBackground('#1a5c38'); // \u30a2\u30d7\u30ea\u57fa\u8abf\u8272\u30b0\u30ea\u30fc\u30f3\n    headerRange.setFontColor('#ffffff');\n    headerRange.setFontWeight('bold');\n    sheet.setFrozenRows(1);\n    // \u5217\u5e45\u81ea\u52d5\u8abf\u6574\n    headers.forEach((_, i) => sheet.setColumnWidth(i + 1, 140));\n  }\n  return sheet;\n}\n\n/**\n * JSON \u30ec\u30b9\u30dd\u30f3\u30b9\u751f\u6210\u30d8\u30eb\u30d1\u30fc\n */\nfunction jsonResponse(obj) {\n  return ContentService.createTextOutput(JSON.stringify(obj))\n    .setMimeType(ContentService.MimeType.JSON);\n}\n";
+
 
 // ═══════════════════════════════════════
 // Init
